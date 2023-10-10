@@ -1,0 +1,11 @@
+Wattana Viriyasitavat, Danupol Hoonsopon,
+Blockchain characteristics and consensus in modern business processes,
+Journal of Industrial Information Integration,
+Volume 13,
+2019,
+Pages 32-39,
+ISSN 2452-414X,
+https://doi.org/10.1016/j.jii.2018.07.004.
+(https://www.sciencedirect.com/science/article/pii/S2452414X18300815)
+Abstract: Blockchain technology has attracted a great deal of attentions as an effective way to innovate business processes. It has to be integrated with other Business Process Management system (BPM) components to implement specified functionalities related to the applications. The current efforts in integrating this technology into BPM are at a very early stage. To apply Blockchain into business processes efficiently, Blockchain and business process characteristics must be identified. Inconsistency of confirmation settlement that heavily relies on the implementation of consensus protocol poses a major challenge in business process operations, especially ones that are time-critical. In addition, validators, nodes responsible for performing consensus operations in a Blockchain system, can introduce bias and as a result are not trustable. This paper first defines Blockchain and also investigates the characteristics of Blockchain and business processes. Then, we suggest an architecture of business processes in Blockchain era to overcome the problems of time inconsistency and consensus bias. The architecture provides persistency, validity, auditability, and disintermediary that Blockchain offers. The architecture also provides flexibility by allowing business partner to select nodes in performing consensus; thus bias is mitigated.
+Keywords: Blockchain; Smart contract; Consensus; Business processes; Service; Workflow; Specification language; System Architecture
