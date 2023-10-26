@@ -42,6 +42,18 @@ build/Release
 node_modules/
 jspm_packages/
 
+# React (front-end)
+frontend/node_modules/
+frontend/.env
+frontend/npm-debug.log
+frontend/build/
+
+# Node (backend)
+backend/node_modules/
+backend/.env
+backend/npm-debug.log
+backend/build/
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
