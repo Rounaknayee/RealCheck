@@ -1,3 +1,6 @@
+#  run docker compose command
+#  docker-compose -f docker-compose.dev.yml up
+
 version: '3'
 
 services:
@@ -6,7 +9,7 @@ services:
       context: ./backend
       dockerfile: dev-backend.Dockerfile
     ports:
-      - "5000:5000"
+      - "5001:5000"
     volumes:
       - ./backend:/usr/src/app
     environment:
@@ -22,3 +25,4 @@ services:
       - ./frontend:/usr/src/app
     depends_on:
       - backend
+
