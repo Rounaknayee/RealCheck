@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json first to optimize Docker caching
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies, including dev dependencies
 RUN npm install
 
 # Copy the rest of the application
@@ -16,5 +16,5 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 5000
 
-# Command to run the application
-CMD ["npm", "start"]
+# Command to run the application with nodemon for hot reloading
+CMD ["npm", "run", "dev"]
