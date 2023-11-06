@@ -31,8 +31,8 @@ startServer(); // start the server
 // Diffrent Routes after starting server
 
 app.use('/api/users',userRouter);
-app.use('/api/suppliers',supplierRouter);
-app.use('/api/manufacturers',manufacturerRouter);
+// app.use('/api/suppliers',supplierRouter);
+// app.use('/api/manufacturers',manufacturerRouter);
 // Public routes which are not protected by auth middleware
 app.use('/api/public', publicRouter);
 
@@ -44,5 +44,5 @@ app.use('/api/public', publicRouter);
 
 // This is just a test api to check if the server is running
 app.get('/api/test', (req, res) => {
-  res.json({ message: "Hello from the backend Worldddd!" });
+  res.json({ message: "The node Backend is working perfectly fine!" });
 });
