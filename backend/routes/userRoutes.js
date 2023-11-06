@@ -3,7 +3,7 @@
 const express = require('express');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const auth = require('../middleware/auth');
+const {auth} = require('../middleware/auth'); // Import auth middleware and destructured auth function
 const router = new express.Router();
 
 // Sign Up
@@ -33,7 +33,7 @@ router.post('/signin', async (req, res) => {
 });
 
 // Log Out
-router.post('/logout', auth, async (req, res) => {
+router.post('/logout',auth, async (req, res) => {
   try {
     req.user.tokens = req.user.tokens.filter((token) => {
       return token.token !== req.token;
