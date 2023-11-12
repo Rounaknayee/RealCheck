@@ -1,0 +1,7 @@
+const express = require('express');
+const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+// const {auth} = require('../middleware/auth'); // Import auth middleware and destructured auth function
+const router = new express.Router();
+
+module.exports = router;

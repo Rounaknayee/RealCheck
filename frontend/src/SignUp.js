@@ -8,7 +8,7 @@ function SignUp() {
   const navigate = useNavigate()
 
   const [formData, setFormData] = useState({
-    username: '',
+    // username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -44,33 +44,37 @@ function SignUp() {
 
     try {
       // Perform client-side validation here if needed
-
+  
       // Send a POST request to the server to create a new user
-      const response = await axios.post('/api/signup', {
-        username: formData.username,
+      const response = await axios.post('/api/users/signup', {
+        // username: formData.username,
         email: formData.email,
         password: formData.password,
-        userType: formData.userType
+        role: formData.userType
       });
       // Handle success (maybe log the user in or redirect to a login page)
 
-      console.log(response.data);
+      console.log(response);
 
-      // Depending on the user type, redirect to the respective homepage
-      if (response.data.user.type === 'manufacturer') {
+      const { token } = response.data;
+      localStorage.setItem('token', token); // or sessionStorage.setItem('token', token);
+
+      // Redirect based on user role
+      const userRole = response.data.user.role;
+      if (userRole === 'manufacturer') {
         navigate('/manufacturer/homepage');
-      } else if (response.data.user.type === 'supplier') {
+      } else if (userRole === 'supplier') {
         navigate('/supplier/homepage');
-      }
+  }
     } catch (error) {
       // Handle errors (display error messages to the user)
-      setErrors(error.response.data.errors || {});
+      setErrors(error.response.data.errors || {}); 
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <label htmlFor="username">Username:</label>
+      {/* <label htmlFor="username">Username:</label>
       <input
         type="text"
         id="username"
@@ -78,7 +82,7 @@ function SignUp() {
         value={formData.username}
         onChange={handleChange}
         required
-      />
+      /> */}
 
       <label htmlFor="email">Email:</label>
       <input
