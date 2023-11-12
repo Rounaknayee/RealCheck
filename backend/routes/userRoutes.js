@@ -8,12 +8,15 @@ const router = new express.Router();
 
 // Sign Up
 router.post('/signup', async (req, res) => {
-  try {
-    const user = new User(req.body);
+   try {
+    const user = new User(
+      req.body
+      );    
     const token = await user.generateAuthToken();
-    await user.save();
-    res.status(201).send({ user, token });
+
+    res.status(201).send({ user, token});
   } catch (e) {
+    // console.log(e);
     res.status(400).send(e);
   }
 });
@@ -33,7 +36,7 @@ router.post('/signin', async (req, res) => {
 });
 
 // Log Out
-router.post('/logout',auth, async (req, res) => {
+router.post('/api/logout',auth, async (req, res) => {
   try {
     req.user.tokens = req.user.tokens.filter((token) => {
       return token.token !== req.token;

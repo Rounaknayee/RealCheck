@@ -1,28 +1,30 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import ConnectionTest from './ConnectionTest.js';
 import LandingPage from './LandingPage';
 import SignUp from './SignUp';
+import ManufacturerDashboard from './elements/ManufacturerDashboard';
+import SupplierDashboard from './elements/SupplierDashboard';
+
 
 function App() {
   return (
     <Router>
       <div className="App">
-        <nav className="App-nav">
-          {/* Link components for navigation */}
-          <Link to="/">Home</Link>
-          <Link to="/test-connection">Test Connection</Link>
-        </nav>
-        {/* A <Switch> looks through its children <Route>s and
-            renders the first one that matches the current URL. */}
         <Routes>
-          <Route path="/test-connection" element={<ConnectionTest />} />
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/signup" element={<SignUp />} />
+          <Route 
+          path="/test-connection" element={<ConnectionTest />} />
+          <Route 
+          path="/" element={<LandingPage />} /> 
+          <Route 
+          path="/signup" element={<SignUp />} />
           {/* nested rotes for manufacturers and suppliers wiht their own homepages */}
-          {/* <Route path="/manufacturer-homepage" component={ManufacturerHomepage} />
-          <Route path="/supplier-homepage" component={SupplierHomepage} /> */}
+          
+          <Route 
+          path="/manufacturer/dashboard" component={<ManufacturerDashboard/>} />
+          <Route
+          path="/supplier/dashboard" element = {<SupplierDashboard />} />
         </Routes>
       </div>
     </Router>
