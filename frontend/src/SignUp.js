@@ -25,7 +25,7 @@ function SignUp() {
     });
   };
 
-  const togglePasswordVisiblity = () => {
+  const togglePasswordVisibility = () => {
     setPasswordShown(passwordShown => !passwordShown);
   };
 
@@ -62,9 +62,9 @@ function SignUp() {
       // Redirect based on user role
       const userRole = response.data.user.role;
       if (userRole === 'manufacturer') {
-        navigate('/manufacturer/homepage');
+        navigate('/manufacturer/dashboard');
       } else if (userRole === 'supplier') {
-        navigate('/supplier/homepage');
+        navigate('/supplier/dashboard');
   }
     } catch (error) {
       // Handle errors (display error messages to the user)
@@ -73,28 +73,26 @@ function SignUp() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {/* <label htmlFor="username">Username:</label>
-      <input
-        type="text"
-        id="username"
-        name="username"
-        value={formData.username}
-        onChange={handleChange}
-        required
-      /> */}
+    <form onSubmit={handleSubmit} className="max-w-lg mx-auto my-10 p-8 bg-white shadow-lg rounded-lg">
+  
+  {/* Email */}
+  <div className="mb-6">
+    <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">Email:</label>
+    <input
+      type="email"
+      id="email"
+      name="email"
+      value={formData.email}
+      onChange={handleChange}
+      required
+      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+    />
+  </div>
 
-      <label htmlFor="email">Email:</label>
-      <input
-        type="email"
-        id="email"
-        name="email"
-        value={formData.email}
-        onChange={handleChange}
-        required
-      />
-
-      <label htmlFor="password">Password:</label>
+  {/* Password */}
+  <div className="mb-6">
+    <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-700">Password:</label>
+    <div className="flex">
       <input
         type={passwordShown ? "text" : "password"}
         id="password"
@@ -102,10 +100,18 @@ function SignUp() {
         value={formData.password}
         onChange={handleChange}
         required
+        className="w-full p-3 border border-gray-300 rounded-l-lg focus:ring-blue-500 focus:border-blue-500"
       />
-      <button type="button" onClick={togglePasswordVisiblity}>Show/Hide Password</button>
+      <button type="button" onClick={togglePasswordVisibility} className="px-4 bg-gray-200 rounded-r-lg">
+        Show/Hide
+      </button>
+    </div>
+  </div>
 
-      <label htmlFor="confirmPassword">Confirm Password:</label>
+  {/* Confirm Password */}
+  <div className="mb-6">
+    <label htmlFor="confirmPassword" className="block mb-2 text-sm font-medium text-gray-700">Confirm Password:</label>
+    <div className="flex">
       <input
         type={confirmPasswordShown ? "text" : "password"}
         id="confirmPassword"
@@ -113,33 +119,46 @@ function SignUp() {
         value={formData.confirmPassword}
         onChange={handleChange}
         required
+        className="w-full p-3 border border-gray-300 rounded-l-lg focus:ring-blue-500 focus:border-blue-500"
       />
-      <button type="button" onClick={toggleConfirmPasswordVisibility}>Show/Hide Confirm Password</button>
+      <button type="button" onClick={toggleConfirmPasswordVisibility} className="px-4 bg-gray-200 rounded-r-lg">
+        Show/Hide
+      </button>
+    </div>
+  </div>
 
-      <label htmlFor="userType">I am a:</label>
-      <select
-        id="userType"
-        name="userType"
-        value={formData.userType}
-        onChange={handleChange}
-        required
-      >
-        <option value="">Select Type</option>
-        <option value="manufacturer">Manufacturer</option>
-        <option value="supplier">Supplier</option>
-      </select>
+  {/* User Type */}
+  <div className="mb-6">
+    <label htmlFor="userType" className="block mb-2 text-sm font-medium text-gray-700">I am a:</label>
+    <select
+      id="userType"
+      name="userType"
+      value={formData.userType}
+      onChange={handleChange}
+      required
+      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+    >
+      <option value="">Select Type</option>
+      <option value="manufacturer">Manufacturer</option>
+      <option value="supplier">Supplier</option>
+    </select>
+  </div>
 
-      <button type="submit">Sign Up</button>
+  {/* Submit Button */}
+  <button type="submit" className="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+    Sign Up
+  </button>
 
-      {/* Display errors if any */}
-      {Object.keys(errors).length > 0 && (
-        <div className="errors">
-          {Object.keys(errors).map((key) => (
-            <p key={key}>{errors[key]}</p>
-          ))}
-        </div>
-      )}
-    </form>
+  {/* Errors */}
+  {Object.keys(errors).length > 0 && (
+    <div className="mt-6 p-4 text-sm text-red-600 bg-red-100 rounded-lg">
+      {Object.keys(errors).map((key) => (
+        <p key={key}>{errors[key]}</p>
+      ))}
+    </div>
+  )}
+</form>
+
   );
 }
 
