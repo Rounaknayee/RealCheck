@@ -73,92 +73,91 @@ function SignUp() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg mx-auto my-10 p-8 bg-white shadow-lg rounded-lg">
+    <form onSubmit={handleSubmit} className="max-w-lg mx-auto my-10 p-8 bg-teal-100 shadow-lg rounded-lg">
   
-  {/* Email */}
-  <div className="mb-6">
-    <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">Email:</label>
-    <input
-      type="email"
-      id="email"
-      name="email"
-      value={formData.email}
-      onChange={handleChange}
-      required
-      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-    />
-  </div>
+      {/* Email */}
+      <div className="mb-6">
+        <label htmlFor="email" className="block mb-2 text-sm font-medium text-teal-700">Email:</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+          className="w-full p-3 border border-teal-300 rounded-lg focus:ring-teal-500 focus:border-teal-500"
+        />
+      </div>
 
-  {/* Password */}
-  <div className="mb-6">
-    <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-700">Password:</label>
-    <div className="flex">
-      <input
-        type={passwordShown ? "text" : "password"}
-        id="password"
-        name="password"
-        value={formData.password}
-        onChange={handleChange}
-        required
-        className="w-full p-3 border border-gray-300 rounded-l-lg focus:ring-blue-500 focus:border-blue-500"
-      />
-      <button type="button" onClick={togglePasswordVisibility} className="px-4 bg-gray-200 rounded-r-lg">
-        Show/Hide
+      {/* Password */}
+      <div className="mb-6">
+        <label htmlFor="password" className="block mb-2 text-sm font-medium text-teal-700">Password:</label>
+        <div className="flex">
+          <input
+            type={passwordShown ? "text" : "password"}
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            className="w-full p-3 border border-teal-300 rounded-l-lg focus:ring-teal-500 focus:border-teal-500"
+          />
+          <button type="button" onClick={togglePasswordVisibility} className="px-4 bg-teal-200 rounded-r-lg">
+            Show/Hide
+          </button>
+        </div>
+      </div>
+
+      {/* Confirm Password */}
+      <div className="mb-6">
+        <label htmlFor="confirmPassword" className="block mb-2 text-sm font-medium text-teal-700">Confirm Password:</label>
+        <div className="flex">
+          <input
+            type={confirmPasswordShown ? "text" : "password"}
+            id="confirmPassword"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+            className="w-full p-3 border border-teal-300 rounded-l-lg focus:ring-teal-500 focus:border-teal-500"
+          />
+          <button type="button" onClick={toggleConfirmPasswordVisibility} className="px-4 bg-teal-200 rounded-r-lg">
+            Show/Hide
+          </button>
+        </div>
+      </div>
+
+      {/* User Type */}
+      <div className="mb-6">
+        <label htmlFor="userType" className="block mb-2 text-sm font-medium text-teal-700">I am a:</label>
+        <select
+          id="userType"
+          name="userType"
+          value={formData.userType}
+          onChange={handleChange}
+          required
+          className="w-full p-3 border border-teal-300 rounded-lg focus:ring-teal-500 focus:border-teal-500"
+        >
+          <option value="">Select Type</option>
+          <option value="manufacturer">Manufacturer</option>
+          <option value="supplier">Supplier</option>
+        </select>
+      </div>
+
+      {/* Submit Button */}
+      <button type="submit" className="w-full p-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
+        Sign Up
       </button>
-    </div>
-  </div>
 
-  {/* Confirm Password */}
-  <div className="mb-6">
-    <label htmlFor="confirmPassword" className="block mb-2 text-sm font-medium text-gray-700">Confirm Password:</label>
-    <div className="flex">
-      <input
-        type={confirmPasswordShown ? "text" : "password"}
-        id="confirmPassword"
-        name="confirmPassword"
-        value={formData.confirmPassword}
-        onChange={handleChange}
-        required
-        className="w-full p-3 border border-gray-300 rounded-l-lg focus:ring-blue-500 focus:border-blue-500"
-      />
-      <button type="button" onClick={toggleConfirmPasswordVisibility} className="px-4 bg-gray-200 rounded-r-lg">
-        Show/Hide
-      </button>
-    </div>
-  </div>
-
-  {/* User Type */}
-  <div className="mb-6">
-    <label htmlFor="userType" className="block mb-2 text-sm font-medium text-gray-700">I am a:</label>
-    <select
-      id="userType"
-      name="userType"
-      value={formData.userType}
-      onChange={handleChange}
-      required
-      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-    >
-      <option value="">Select Type</option>
-      <option value="manufacturer">Manufacturer</option>
-      <option value="supplier">Supplier</option>
-    </select>
-  </div>
-
-  {/* Submit Button */}
-  <button type="submit" className="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-    Sign Up
-  </button>
-
-  {/* Errors */}
-  {Object.keys(errors).length > 0 && (
-    <div className="mt-6 p-4 text-sm text-red-600 bg-red-100 rounded-lg">
-      {Object.keys(errors).map((key) => (
-        <p key={key}>{errors[key]}</p>
-      ))}
-    </div>
-  )}
-</form>
-
+      {/* Errors */}
+      {Object.keys(errors).length > 0 && (
+        <div className="mt-6 p-4 text-sm text-red-600 bg-red-100 rounded-lg">
+          {Object.keys(errors).map((key) => (
+            <p key={key}>{errors[key]}</p>
+          ))}
+        </div>
+      )}
+    </form>
   );
 }
 

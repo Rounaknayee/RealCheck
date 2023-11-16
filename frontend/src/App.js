@@ -10,6 +10,11 @@ import Products from './elements/Products';
 import Suppliers from './elements/Suppliers';
 import Profile from './elements/Profile';
 import SupplierDashboard from './elements/SupplierDashboard.js';
+import SDashboardHome from './elements/SDashboardHome.js';
+import SProducts from './elements/SProducts.js';
+import SProfile from './elements/SProfile.js';
+import Scan from './elements/Scan.js';
+
 
 
 function App() {
@@ -23,11 +28,11 @@ function App() {
           path="/" element={<LandingPage />} /> 
           <Route 
           path="/signup" element={<SignUp />} />
+          <Route
+          path="/scan" element={<Scan />} />
+
           {/* nested rotes for manufacturers and suppliers wiht their own homepages */}
-          
-          {/* <Route 
-          path="/manufacturer/dashboard" component={<ManufacturerDashboard/>} /> */}
-          
+                    
           <Route path="/manufacturer/" element={<ManufacturerDashboard />}>
             <Route index element={<DashboardHome />} /> {/* Default route */}
             <Route path="dashboard" element={<DashboardHome />} />
@@ -36,10 +41,15 @@ function App() {
             <Route path="profile" element={<Profile />} />
             {/* Add more nested routes as needed */}
           </Route>
-        {/* Other routes */}
           
-          <Route
-          path="/supplier/dashboard" element = {<SupplierDashboard />} />
+          <Route path="/supplier/" element = {<SupplierDashboard />} >
+            {/* Here below i need routes for suppliers */}
+            <Route index element={<SDashboardHome />} /> {/* Default route */}
+            <Route path="dashboard" element={<SDashboardHome />} />
+            <Route path="products" element={<SProducts />} />
+            <Route path="profile" element={<SProfile />} />
+          </Route>
+          
         </Routes>
       </div>
     </Router>
