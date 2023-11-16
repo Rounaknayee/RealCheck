@@ -40,7 +40,7 @@ function ConnectionTest() {
 
   return (
     <div className="connection-test">
-      <p>{message}</p>
+      {/* <p>{message}</p> */}
     </div>
   );
 }

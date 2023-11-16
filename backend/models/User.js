@@ -6,7 +6,13 @@ const config = require('../config/config');
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['manufacturer', 'supplier'], required: true }
+  role: { type: String, enum: ['manufacturer', 'supplier'], required: true },
+  tokens: [{
+    token: {
+      type: String,
+      required: true
+    }
+  }]
 });
 
 userSchema.pre('save', async function (next) {
@@ -21,14 +27,24 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 };
 
 userSchema.methods.generateAuthToken = async function () {
-    const user = this;
-    const token = jwt.sign({ _id: user._id.toString() }, config.jwtSecret);
-    user.tokens = token;//user.tokens.concat({ token });
-    await user.save();
+  try {
     console.log("Inside generateAuthToken");
-    console.log(user);
+    const user = this;
+    // Initialize tokens as an empty array if it's undefined
+     if (!user.tokens) {
+      user.tokens = [];
+    }
+    const token = jwt.sign({ _id: user._id.toString() }, config.jwtSecret);
+    // Assuming user.tokens is an array
+    user.tokens = user.tokens.concat({ token });
+    await user.save();
+    console.log("Token generated and saved successfully");
     return token;
-  };  
+  } catch (error) {
+    console.error("Error in generateAuthToken:", error);
+    throw error;
+  }
+};
 
 const User = mongoose.model('User', userSchema);
 
