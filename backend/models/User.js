@@ -19,6 +19,13 @@ userSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 8);
   }
+  if (this.isModified('email')) {
+    const existingUser = await mongoose.models.User.findOne({ email: this.email });
+    if (existingUser) {
+      // return next(new Error('Email already exists.'));
+      throw Error('Email already exists.');
+    }
+  }
   next();
 });
 
@@ -37,8 +44,7 @@ userSchema.methods.generateAuthToken = async function () {
     const token = jwt.sign({ _id: user._id.toString() }, config.jwtSecret);
     // Assuming user.tokens is an array
     user.tokens = user.tokens.concat({ token });
-    await user.save();
-    console.log("Token generated and saved successfully");
+    console.log("Token generated successfully");
     return token;
   } catch (error) {
     console.error("Error in generateAuthToken:", error);

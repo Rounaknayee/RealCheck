@@ -23,12 +23,6 @@ const Navlinks = [
         path: '/manufacturer/profile',
         cName: 'nav-text'
     }
-    // ,
-    // {
-    //     title: 'Logout',
-    //     path: '',
-    //     cName: 'nav-text'
-    // }
 ]
 
 const ManufacturerDashboard = () => {

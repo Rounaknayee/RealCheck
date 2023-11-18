@@ -1,9 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
-import ConnectionTest from './ConnectionTest.js';
 import LandingPage from './LandingPage';
-import SignUp from './SignUp';
 import ManufacturerDashboard from './elements/ManufacturerDashboard';
 import DashboardHome from './elements/DashboardHome';
 import Products from './elements/Products';
@@ -15,19 +13,17 @@ import SProducts from './elements/SProducts.js';
 import SProfile from './elements/SProfile.js';
 import Scan from './elements/Scan.js';
 
-
-
 function App() {
   return (
     <Router>
       <div className="App">
         <Routes>
-          <Route 
+          {/* <Route 
           path="/test-connection" element={<ConnectionTest />} />
           <Route 
-          path="/" element={<LandingPage />} /> 
+          path="/signup" element={<SignUp />} /> */}
           <Route 
-          path="/signup" element={<SignUp />} />
+          path="/" element={<LandingPage />} /> 
           <Route
           path="/scan" element={<Scan />} />
 

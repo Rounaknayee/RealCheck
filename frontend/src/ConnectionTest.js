@@ -1,26 +1,3 @@
-// // ConnectionTest.js
-
-// import React, { useEffect, useState } from 'react';
-
-// function ConnectionTest() {
-//   const [message, setMessage] = useState("");
-
-//   useEffect(() => {
-//     fetch("/api/test")
-//       .then(response => response.json())
-//       .then(data => setMessage(data.message));
-//   }, []);
-
-//   return (
-//     <div className = "connection-test">
-//         <p>{message}</p>
-//     </div>
-
-//   );
-// }
-
-// export default ConnectionTest;
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -40,7 +17,10 @@ function ConnectionTest() {
 
   return (
     <div className="connection-test">
-      {/* <p>{message}</p> */}
+       <p className="text-lg text-teal-600 mb-6">
+            Real Check is a platform that helps you verify the authenticity of your products.
+          </p>
+      <p>{message}</p>
     </div>
   );
 }

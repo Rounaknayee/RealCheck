@@ -67,8 +67,9 @@ function SignUp() {
         navigate('/supplier/dashboard');
   }
     } catch (error) {
+      console.log(error.response.data.error)
       // Handle errors (display error messages to the user)
-      setErrors(error.response.data.errors || {}); 
+      setErrors(error.response.data.error || {}); 
     }
   };
 
