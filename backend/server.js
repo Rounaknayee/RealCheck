@@ -12,6 +12,7 @@ const manufacturerRouter = require('./routes/manufacturerRoutes');
 const publicRouter = require('./routes/publicRoutes');
 
 const app = express();
+app.use(express.json())
 app.use(cors());
 // Async function to connect to DB and then start the server
 const startServer = async () => {
@@ -39,10 +40,11 @@ app.use('/api/public', publicRouter);
 
 // app.use('/api/products',productRouter);
 // app.use('/api/orders',orderRouter);
-// app.use('/api/transactions',transactionRouter);
+// app.use('/api/transactions',transactionRouter);d
 
 
 // This is just a test api to check if the server is running
 app.get('/api/test', (req, res) => {
-  res.json({ message: "Hello from the backend Worldddd!" });
+  console.log("Test api called");
+  res.json({ message: "The node Backend is working perfectly fine!" });
 });

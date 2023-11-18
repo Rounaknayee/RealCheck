@@ -4,7 +4,15 @@
 version: '3'
 
 services:
+  # ganache:
+  #   container_name: ganache-realcheck
+  #   image: trufflesuite/ganache-cli
+  #   command: ganache-cli -h 0.0.0.0
+  #   ports:
+      # - "8545:8545"
+
   backend:
+    container_name: backend-realcheck
     build: 
       context: ./backend
       dockerfile: dev-backend.Dockerfile
@@ -14,8 +22,11 @@ services:
       - ./backend:/usr/src/app
     environment:
       - NODE_ENV=development
+    # depends_on:
+    #   - ganache
 
   frontend:
+    container_name: frontend-realcheck
     build:
       context: ./frontend
       dockerfile: dev-frontend.Dockerfile
@@ -25,4 +36,3 @@ services:
       - ./frontend:/usr/src/app
     depends_on:
       - backend
-
