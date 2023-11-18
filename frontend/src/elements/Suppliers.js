@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Suppliers = () => {
-  return <div>Dashboard Home Content</div>;
+  return <div>List of suppliers by querying blockchain</div>;
 };
 
 export default Suppliers;

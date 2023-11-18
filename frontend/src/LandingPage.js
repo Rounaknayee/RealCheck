@@ -1,6 +1,6 @@
 // ConnectionTest.js
 
-import { Route,Router, Link, } from 'react-router-dom';
+// import { Route,Router, Link, } from 'react-router-dom';
 import SignUp from './SignUp';
 import ConnectionTest from './ConnectionTest';
 import SignIn from './SignIn';
@@ -8,7 +8,6 @@ import { useState } from 'react';
 
 function LandingPage() {
   const [activeComponent, setActiveComponent] = useState('connectionTest');
-
   const renderComponent = () => {
     switch(activeComponent) {
       case 'connectionTest':
@@ -41,9 +40,6 @@ function LandingPage() {
       <div className="flex-grow flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-teal-800 mb-4">Welcome to Real Check</h1>
-          <p className="text-lg text-teal-600 mb-6">
-            Real Check is a platform that helps you verify the authenticity of your products.
-          </p>
           {renderComponent()}
         </div>
       </div>

@@ -7,12 +7,6 @@ const Navigation = ({ Navlinks }) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    // const token = localStorage.getItem('token');
-    // if (!token) {
-    //   console.error('No token found');
-    //   return;
-    // }
-    // console.log('logout called in FE');
     try {
       const response = await axios.post('/api/users/logout', {}, {
         headers: {
@@ -33,43 +27,44 @@ const Navigation = ({ Navlinks }) => {
   };
 
   return (
-    <div className="flex flex-col h-full justify-between">
-      <div>
-        {/* Logo Space */}
-        <div className="p-4">
-          {/* Logo here (e.g., an image or text) */}
-        </div>
-
-        {/* Hamburger Icon */}
-        <button
-          className="p-2 text-gray-500 hover:text-gray-700 md:hidden"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {/* SVG Icon */}
-        </button>
-
-        {/* Navigation Links */}
-        <div className={`flex flex-col items-center ${isOpen ? 'block' : 'hidden'} md:block`}>
-          {Navlinks.map((link, index) => (
-            <Link
-              key={index}
-              to={link.path}
-              className={`${link.cName} block py-2 px-4 text-sm hover:bg-gray-200`}
-            >
-              {link.title}
-            </Link>
-          ))}
-        </div>
+  <div className="flex flex-col h-full justify-between bg-teal-600 text-white">
+  <div>
+      {/* Application Name */}
+      <div className="p-4 text-2xl font-bold">
+        Real Check
       </div>
 
-      {/* Logout Button */}
+      {/* Hamburger Icon */}
       <button
-        onClick={handleLogout}
-        className="m-4 py-2 px-6 bg-red-600 hover:bg-red-700 text-white rounded-md"
+        className="p-2 text-white hover:text-teal-200 md:hidden"
+        onClick={() => setIsOpen(!isOpen)}
       >
-        Logout
+        {/* SVG Icon */}
       </button>
-    </div>
+
+      {/* Navigation Links */}
+      <div className={`flex flex-col items-center ${isOpen ? 'block' : 'hidden'} md:block`}>
+        {Navlinks.map((link, index) => (
+          <Link
+            key={index}
+            to={link.path}
+            className={`${link.cName} block mx-8 my-16 py-2 px-4 text-sm hover:bg-teal-700 hover:font-bold rounded-lg`}
+          >
+            {link.title}
+          </Link>
+        ))}
+      </div>
+  </div>
+
+  {/* Logout Button */}
+  <button
+    onClick={handleLogout}
+    className="m-4 py-2 px-6 bg-white hover:bg-red-700 hover:text-white text-red-700 rounded-md"
+  >
+    Logout
+  </button>
+</div>
+
   );
 };
 

@@ -49,7 +49,8 @@ const SignIn = () => {
       console.log('Form submitted');
     } catch (error) {
       // Handle errors
-      setErrors(error.response.data.errors || {});
+      console.error(error.response.data.error);
+      setErrors(error.response.data.error || {});
     }
   };
 
