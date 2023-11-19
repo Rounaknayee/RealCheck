@@ -5,23 +5,42 @@ const jwt = require('jsonwebtoken');
 const {auth} = require('../middleware/auth'); // Import auth middleware and destructured auth function
 const router = new express.Router();
 
-// Sign Up
+/*
+    Create a user
+    POST /api/signup
+    {
+        "email": "abc@xyz.com"
+        "password": "password",
+        "role": "manufacturer"
+    }
+*/
 router.post('/signup', async (req, res) => {
    try {
-    const user = new User(
-      req.body
-      );    
+    // const user = new User(
+    //   req.body
+    //   );    
+    const user = new User({
+      email: req.body.email,
+      password: req.body.password,
+      role: req.body.role
+    });
     const token = await user.generateAuthToken();
-    await user.save();
     console.log("User saved successfully");
     res.status(201).send({ user, token});    
   } catch (e) {
-    // console.log(e.toString());
+    console.log(e);
     res.status(400).send(e);
   }
 });
 
-// Sign In
+/*
+    Login a user
+    POST /api/signin
+    {
+        "email": "abc@xyz.com"
+        "password": "password"
+    }
+*/
 
 router.post('/signin', async (req, res) => {
   try {
@@ -40,15 +59,16 @@ router.post('/signin', async (req, res) => {
     const token = await user.generateAuthToken();
     res.send({ user, token });
   } catch (error) {
-    console.error(error);
     res.status(400).send(error);
   }
 });
 
-// LogOut
+
+/*
+    Logout a user
+    POST /api/logout
+*/
 router.post('/logout',auth, async (req, res) => {
-  console.log('logout');
-  console.log(req.user);
   try {
     req.user.tokens = req.user.tokens.filter((token) => {
       return token.token != req.token;
@@ -59,5 +79,4 @@ router.post('/logout',auth, async (req, res) => {
     res.status(500).send(error);
   }
 });
-
 module.exports = router;
