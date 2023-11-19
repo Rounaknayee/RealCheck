@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const config = require('../config/config');
 
-const auth = async (req, res, next) => {
+const auth = async (req, res, next) => { 
   try {
     const token = req.header('Authorization').replace('Bearer ', '');
     const decoded = jwt.verify(token, config.jwtSecret);
@@ -16,11 +16,12 @@ const auth = async (req, res, next) => {
     if (!user) {
       throw new Error('User not found.');
     }
-
     req.user = user;
-    req.token = token;
+    req.token = token; 
     next();
   } catch (error) {
+    console.log(error);
+    console.log("error in auth");
     res.status(401).send({ error: 'Please authenticate.' });
   }
 };
@@ -30,6 +31,7 @@ const checkRole = (role) => (req, res, next) => {
   if (req.user && req.user.role === role) {
     next();
   } else {
+    console.log("error in checkRole");
     res.status(403).send('Error: Access denied.');
   }
 };

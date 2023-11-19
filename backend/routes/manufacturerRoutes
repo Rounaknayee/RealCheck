@@ -1,25 +1,59 @@
 const express = require('express');
-const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 // const {auth} = require('../middleware/auth'); // Import auth middleware and destructured auth function
+const Product = require('../models/Product'); // Adjust the path as needed
+const { auth, checkRole } = require('../middleware/auth');
 const router = new express.Router();
 
-router.post('/createproduct', async (req, res) => {
+
+
+// // test route
+// router.get('/test', async (req, res) => {
+//     console.log("test product")
+//     res.status(200).send('Test route successful');
+// });
+
+/*
+    Create a product
+    POST /api/manufacturer/createproduct
+    {
+        "name": "Product 1",
+        "description": "Product 1 description"
+    }
+*/
+router.post('/createproduct', auth, checkRole('manufacturer'), async (req, res) => {
+    console.log("create product")
+    console.log(req);
     try {
       const product = new Product({
         name: req.body.name,
         description: req.body.description,
-        serialNumber: req.body.serialNumber,
         manufacturer: req.user._id, // Assuming req.user is populated from authentication middleware
-        // ... other fields
+        // ... other fields 
       });
-  
+
       await product.save();
       res.status(201).send(product);
     } catch (error) {
-      res.status(400).send(error);
+        console.log(error);
+      res.status(403).send(error);
     }
-  });
+});
+
+/*
+    Get all products
+    GET /api/manufacturer/productlist
+*/
+router.get('/productlist', auth, checkRole('manufacturer'), async (req, res) => {
+    try {
+      const manufacturerId = req.user._id;
+      const products = await Product.find({ manufacturer: manufacturerId });
+      res.status(200).send(products);
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ error: 'Internal Server Error' });
+    }
+});
   
 
 module.exports = router;

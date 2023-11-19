@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
-  productId: { type: String, required: true, unique: true },
+  productId: { type: String, required: false, unique: true },
   manufacturer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -16,9 +16,16 @@ const productSchema = new mongoose.Schema({
 // Add a pre-save hook to generate a productId
 productSchema.pre('save', function(next) {
     if (!this.productId) {
-      const timestamp = Date.now();
-      const randomSuffix = Math.floor(Math.random() * 10000); // Random 4-digit number
-      this.productId = `RC-${timestamp}-${randomSuffix}`;
+        try {
+            const timestamp = Date.now();
+            const randomSuffix = Math.floor(Math.random() * 10000); // Random 4-digit number
+            this.productId = `RC-${timestamp}-${randomSuffix}`;
+            console.log("Product ID generated successfully");
+        }
+        catch (error) {
+            console.error("Error in generateProductId:", error);
+            throw error;
+        }
     }
     next();
   });
