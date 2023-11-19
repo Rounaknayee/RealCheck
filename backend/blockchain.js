@@ -24,7 +24,8 @@ getTokenBalances(walletAddress)
     .catch(error => console.error('Failed to get token balances:', error));
 
 // // Connect to the Ethereum network
-// const provider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_API_URL);
+// const provider = 
+new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_API_URL);
 
 // async function checkBalance(address) {
 //     try {
