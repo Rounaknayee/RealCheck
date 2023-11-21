@@ -5,27 +5,22 @@ import Navigation from './Navigation';
 const Navlinks = [
     {
         title: 'Dashboard',
-        path: '/manufacturer/dashboard',
+        path: '/supplier/dashboard',
         cName: 'nav-text'
     },
     {
         title: 'Products',
-        path: '/manufacturer/products',
-        cName: 'nav-text'
-    },
-    {
-        title: 'Suppliers',
-        path: '/manufacturer/suppliers',
+        path: '/supplier/products',
         cName: 'nav-text'
     },
     {
         title: 'Profile',
-        path: '/manufacturer/profile',
+        path: '/supplier/profile',
         cName: 'nav-text'
     }
 ]
 
-const ManufacturerDashboard = () => {
+const SupplierDashboard = () => {
     return (
       <div className="flex">
         <div className="w-64 bg-gray-100 min-h-screen">
@@ -37,5 +32,6 @@ const ManufacturerDashboard = () => {
       </div>
     );
   };
-  
-  export default ManufacturerDashboard;
+
+
+export default SupplierDashboard;
