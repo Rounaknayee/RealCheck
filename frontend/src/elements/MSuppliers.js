@@ -1,7 +1,7 @@
 import React from 'react';
 
-const Suppliers = () => {
+const MSuppliers = () => {
   return <div>List of suppliers by querying blockchain</div>;
 };
 
-export default Suppliers;
+export default MSuppliers;

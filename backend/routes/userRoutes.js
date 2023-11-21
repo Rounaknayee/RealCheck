@@ -3,7 +3,9 @@ const express = require('express');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const {auth} = require('../middleware/auth'); // Import auth middleware and destructured auth function
+const { Wallet } = require('ethers');
 const router = new express.Router();
+const axios = require('axios');
 
 /*
     Create a user
@@ -15,10 +17,8 @@ const router = new express.Router();
     }
 */
 router.post('/signup', async (req, res) => {
-   try {
-    // const user = new User(
-    //   req.body
-    //   );    
+  //check first if user exists
+  try {   
     const user = new User({
       email: req.body.email,
       password: req.body.password,
@@ -26,6 +26,14 @@ router.post('/signup', async (req, res) => {
     });
     const token = await user.generateAuthToken();
     console.log("User saved successfully");
+    // Generate wallet address and private key
+    const wallet = Wallet.createRandom();
+    user.walletAddress = wallet.address;
+    user.privateKey = wallet.privateKey;
+    user.mnemonicPhrase = wallet.mnemonic.phrase;
+    user.publicKey = wallet.publicKey;
+    await user.save();
+    console.log("Wallet saved successfully");
     res.status(201).send({ user, token});    
   } catch (e) {
     console.log(e);
@@ -48,21 +56,35 @@ router.post('/signin', async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(401).send({ error: 'Login failed! User not found.' });
+      return res.status(401).send({ error: 'Login failed! User not found' });
     }
 
     const isPasswordMatch = await user.comparePassword(password);
     if (!isPasswordMatch) {
-      return res.status(401).send({ error: 'Login failed! Incorrect password.' });
+      return res.status(401).send({ error: 'Login failed! Incorrect Password' });
     }
 
     const token = await user.generateAuthToken();
-    res.send({ user, token });
+    res.send({ user,  token }); 
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send({error: error});
   }
 });
 
+/*
+    Get user details
+    GET /api/userdetails
+*/
+router.get('/userdetails', auth, async (req, res) => {
+  try{
+    email = req.user.email;
+    walletAddress = req.user.walletAddress;
+    const response = await axios.get(`https://sepolia-api.ethplorer.io/getAddressInfo/${walletAddress}?apiKey=freekey`);
+    ethBalance = response.data.ETH.balance;
+    res.status(200).send({email, walletAddress, ethBalance});
+  }catch(error){
+    res.status(401).send(error);
+  }});
 
 /*
     Logout a user
