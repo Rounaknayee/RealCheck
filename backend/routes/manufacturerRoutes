@@ -1,17 +1,19 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 // const {auth} = require('../middleware/auth'); // Import auth middleware and destructured auth function
 const Product = require('../models/Product'); // Adjust the path as needed
 const { auth, checkRole } = require('../middleware/auth');
 const router = new express.Router();
+const productAuthenticityContract = require('../SmartContracts/smartContractHelper');
 
 
-
-// // test route
-// router.get('/test', async (req, res) => {
-//     console.log("test product")
-//     res.status(200).send('Test route successful');
-// });
+// Generate a product id
+function generateproductid() {
+    var timestamp = Date.now();
+    var randomSuffix = Math.floor(Math.random() * 100000); // Random 4-digit number
+    return `RC-${timestamp}-${randomSuffix}`;
+}
 
 /*
     Create a product
@@ -25,18 +27,23 @@ router.post('/createproduct', auth, checkRole('manufacturer'), async (req, res) 
     console.log("create product")
     console.log(req);
     try {
-      const product = new Product({
-        name: req.body.name,
-        description: req.body.description,
-        manufacturer: req.user._id, // Assuming req.user is populated from authentication middleware
-        // ... other fields 
-      });
-
-      await product.save();
-      res.status(201).send(product);
+        const product_id = generateproductid();
+        const privateKey = req.user.privateKey;
+        const contractInstance = new productAuthenticityContract(privateKey);
+        const result = await contractInstance.addProduct(product_id, req.body.name, req.user.email);
+        const product = new Product({
+            name: req.body.name,
+            description: req.body.description,
+            manufacturer: req.user._id, 
+            productId: product_id, 
+            product_transaction: result['events'][0]['transactionHash'],
+            manufacturer_address: req.user.walletAddress,
+            current_holder: req.user.walletAddress
+        });
+        await product.save();   
+        res.status(201).send(product);
     } catch (error) {
-        console.log(error);
-      res.status(403).send(error);
+        console.error(error);  res.status(403).send(error);
     }
 });
 

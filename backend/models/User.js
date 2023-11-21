@@ -31,17 +31,6 @@ userSchema.pre('save', async function (next) {
       throw({ error: 'Email already exists.' });
     }
   }
-  //  Generate wallet address, private key, mnemonic and mnemonic phrase
-  try {
-    const wallet = ethers.Wallet.createRandom();
-    this.walletAddress = wallet.address;
-    this.publicKey = wallet.publicKey;
-    this.privateKey = wallet.privateKey;
-    this.mnemonicPhrase = wallet.mnemonic.phrase;
-  }catch (error) {
-    console.error("Error in generateWallet:", error);
-    throw {error: error};
-  }
   next();
 });
 
