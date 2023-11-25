@@ -28,4 +28,3 @@ RealCheck is a blockchain-based application designed to ensure the authenticity 
 - npm or yarn
 - Docker (running with containers)
 - Ethereum wallet with test Ether (for interacting with smart contracts)
-

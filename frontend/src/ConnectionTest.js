@@ -5,13 +5,27 @@ function ConnectionTest() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
+
+    // fetch("/api/test")
+    //   .then(response => {
+    //     if (!response.ok) {
+    //       throw new Error('Network response was not ok');
+    //     }
+    //     return response.json();
+    //   })
+    //   .then(data => {
+    //     setMessage(data.message);
+    //   })
+    //   .catch(error => {
+    //     console.error('There was an error!', error);
+    //   });
     // Using Axios to make the HTTP request
     axios.get("/api/test")
       .then(response => {
         setMessage(response.data.message);
       })
       .catch(error => {
-        console.error('There was an error!', error);
+        console.error('There was an error!', error.message);
       });
   }, []);
 

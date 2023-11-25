@@ -6,6 +6,7 @@ const Product = require('../models/Product'); // Adjust the path as needed
 const { auth, checkRole } = require('../middleware/auth');
 const router = new express.Router();
 const productAuthenticityContract = require('../SmartContracts/smartContractHelper');
+const User = require('../models/User');
 
 
 // Generate a product id
@@ -59,6 +60,19 @@ router.get('/productlist', auth, checkRole('manufacturer'), async (req, res) => 
     } catch (error) {
       console.log(error);
       res.status(500).send({ error: 'Internal Server Error' });
+    }
+});
+
+/*
+    Get a list of suppliers
+    GET /api/manufacturer/supplierlist
+*/
+router.get('/supplierlist', auth, checkRole('manufacturer'), async (req, res) => {
+    try {
+        const suppliers  = await User.find({ role: 'supplier' });
+        res.status(200).send(suppliers);
+    } catch (error) {
+        res.status(500).send({ error: 'Error Retrieving suppliers' });
     }
 });
   
