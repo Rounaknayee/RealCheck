@@ -1,5 +1,5 @@
 # Use the official Node.js image as our base
-FROM node:16
+FROM node:20
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Expose the port the app runs on
-EXPOSE 5000
+EXPOSE 5001
 
 # Command to run the application with nodemon for hot reloading
 CMD ["npm", "run", "dev"]
