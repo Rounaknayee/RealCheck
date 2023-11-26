@@ -36,6 +36,7 @@ router.post('/createproduct', auth, checkRole('manufacturer'), async (req, res) 
             name: req.body.name,
             description: req.body.description,
             manufacturer: req.user._id, 
+            manufacturer_email: req.user.email,
             productId: product_id, 
             product_transaction: result['events'][0]['transactionHash'],
             manufacturer_address: req.user.walletAddress,
@@ -69,12 +70,73 @@ router.get('/productlist', auth, checkRole('manufacturer'), async (req, res) => 
 */
 router.get('/supplierlist', auth, checkRole('manufacturer'), async (req, res) => {
     try {
-        const suppliers  = await User.find({ role: 'supplier' });
+        const suppliers  = await User.find({
+             role: 'supplier' 
+            }).select('email walletAddress');
+        console.log("suppliers fetched");
         res.status(200).send(suppliers);
     } catch (error) {
         res.status(500).send({ error: 'Error Retrieving suppliers' });
     }
 });
+
+
+/* 
+    Tranfer a Product to a Supplier
+    POST /api/manufacturer/transferproduct
+    {
+        "productID": "Product_id",
+        "supplier_address": "Supplier Address"
+    }
+*/
+router.post('/transferproduct', auth, checkRole('manufacturer'), async (req, res) => {
+    
+    try {
+        console.log("Entered transfer product");
+        const privateKey = req.user.privateKey;
+        const supplier = await User.findOne({ email: req.body.supplier_email }).select('walletAddress');
+        const contractInstance = new productAuthenticityContract(privateKey);
+        const result = await contractInstance.transferProduct(req.body.product_id, supplier.walletAddress);
+        const product = await Product.findOne({ 
+            productId: req.body.product_id 
+        });
+        product.current_holder = supplier.walletAddress;
+        product.product_transaction = result['events'][0]['transactionHash'];
+        console.log(product);
+        await product.save();
+        res.status(200).send(product);
+    } catch (error) {
+        console.error(error);  res.status(403).send(error);
+    }
+});
+
+/*
+    Change the product holder
+    POST /api/manufacturer/changeholder
+    {
+        "productID": "Product_id",
+        "new_holder": "New Holder Address"
+    }
+*/
+router.post('/changeholder', auth, checkRole('manufacturer'), async (req, res) => {
+    console.log("Entered change holder");
+    console.log(req.body);
+    try {
+        const privateKey = req.user.privateKey;
+        const contractInstance = new productAuthenticityContract(privateKey);
+        const result = await contractInstance.changeHolder(req.body.productID, req.body.new_holder);
+        console.log("Product Transfer result");
+        console.log(result);
+        const product = await Product.findOne({ productId: req.body.product_id });
+        product.current_holder = req.body.new_holder;
+        product.product_transaction = result['events'][0]['transactionHash'];
+        await product.save();
+        res.status(200).send(product);
+    } catch (error) {
+        console.error(error);  res.status(403).send(error);
+    }
+});
+
   
 
 module.exports = router;

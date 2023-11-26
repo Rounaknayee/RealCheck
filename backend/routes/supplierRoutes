@@ -1,7 +1,27 @@
 const express = require('express');
 const User = require('../models/User');
+const Product = require('../models/Product');
 const jwt = require('jsonwebtoken');
+const { auth, checkRole } = require('../middleware/auth');
 // const {auth} = require('../middleware/auth'); // Import auth middleware and destructured auth function
 const router = new express.Router();
+
+/* 
+    GET Supplier products
+    GET /api/supplier/prouctlist
+*/
+router.get('/productlist',auth, checkRole('supplier'), async (req, res) => {
+    console.log("product list");
+    try {
+        console.log("product list");
+        console.log(req.user);
+
+        const products = await Product.find({ current_holder: req.user.walletAddress });
+        res.status(200).send(products);
+    } catch (error) {
+        console.error(error);  res.status(403).send(error);
+    }
+});
+    
 
 module.exports = router;
