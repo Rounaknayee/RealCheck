@@ -29,7 +29,7 @@ const MSuppliers = () => {
           <thead>
             <tr className="bg-teal-700 text-white">
               <th className="p-2">Name</th>
-              {/* <th className="p-2">Details</th> */}
+              <th className="p-2">Wallet Address</th>
               {/* Add more headers if needed */}
             </tr>
           </thead>
@@ -37,7 +37,7 @@ const MSuppliers = () => {
             {suppliers.map((supplier, index) => (
               <tr key={index} className="border-b">
                 <td className="p-2">{supplier.email}</td>
-                {/* <td className="p-2">{supplier.details}</td> */}
+                <td className="p-2">{supplier.walletAddress}</td>
                 {/* Render other supplier properties as needed */}
               </tr>
             ))}

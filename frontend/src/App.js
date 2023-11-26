@@ -40,8 +40,8 @@ function App() {
           
           <Route path="/supplier/" element = {<SupplierDashboard />} >
             {/* Here below i need routes for suppliers */}
-            <Route index element={<SDashboardHome />} /> {/* Default route */}
-            <Route path="dashboard" element={<SDashboardHome />} />
+            <Route index element={<MDashboardHome />} /> {/* Default route */}
+            <Route path="dashboard" element={<MDashboardHome />} />
             <Route path="products" element={<SProducts />} />
             <Route path="profile" element={<SProfile />} />
           </Route>

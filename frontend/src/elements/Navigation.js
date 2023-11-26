@@ -24,8 +24,7 @@ const Navigation = ({ Navlinks }) => {
   };
 
   return (
-  <div className="flex flex-col h-full justify-between bg-teal-600 text-white">
-  <div>
+  <div className="flex flex-col h-full justify-between bg-teal-600 text-white p-4">
       {/* Application Name */}
       <div className="p-4 text-2xl font-bold">
         Real Check
@@ -37,6 +36,22 @@ const Navigation = ({ Navlinks }) => {
         onClick={() => setIsOpen(!isOpen)}
       >
         {/* SVG Icon */}
+
+        <svg className="fill-current h-6 w-6" viewBox="0 0 24 24">  
+          {isOpen ? (
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM20 18H4V16H20V18Z"
+            />
+          ) : (
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M4 6H20V8H4V6ZM4 11H20V13H4V11ZM4 16H20V18H4V16Z"
+            />
+          )}
+        </svg>
       </button>
 
       {/* Navigation Links */}
@@ -51,12 +66,11 @@ const Navigation = ({ Navlinks }) => {
           </Link>
         ))}
       </div>
-  </div>
 
   {/* Logout Button */}
   <button
     onClick={handleLogout}
-    className="m-4 py-2 px-6 bg-white hover:bg-red-700 hover:text-white text-red-700 rounded-md"
+    className=" py-2 px-6 bg-white hover:bg-red-700 hover:text-white text-red-700 rounded-md"
   >
     Logout
   </button>
