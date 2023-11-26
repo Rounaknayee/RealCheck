@@ -2,14 +2,22 @@
 
 const { ethers } = require('ethers');
 require('dotenv').config();
+const config = require('../config/config');
+
+
 
 class smartContractHelper {
     constructor(privateKey) {
 
         this.contractABI = require('./contractABI.json');
-        this.alchemyProvider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_API_URL);
+        this.alchemyProvider = new ethers.providers.JsonRpcProvider(config.alchemyProviderURL);
         this.signer = new ethers.Wallet(privateKey, this.alchemyProvider);
-        this.contract = new ethers.Contract(process.env.CONTRACT_ADDRESS, this.contractABI, this.signer);
+        this.contract = new ethers.Contract(config.contractAddress, this.contractABI, this.signer);
+        // console.log('contract', this.contract);
+        // console.log('signer', this.signer);
+        // console.log('alchemyProvider', this.alchemyProvider);
+        // console.log('alchemyurl', config.alchemyProviderURL);
+        // console.log('contractAddress', config.contractAddress);
     }
 
     async addProduct(productId, name, manufacturer) {
