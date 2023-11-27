@@ -57,7 +57,7 @@ function SignUp() {
       console.log(response);
 
       const { token } = response.data;
-      localStorage.setItem('token', token); // or sessionStorage.setItem('token', token);
+      sessionStorage.setItem('token', token); // or sessionStorage.setItem('token', token);
 
       // Redirect based on user role
       const userRole = response.data.user.role;

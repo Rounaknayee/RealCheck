@@ -6,6 +6,7 @@ const Product = require('../models/Product'); // Adjust the path as needed
 const { auth, checkRole } = require('../middleware/auth');
 const router = new express.Router();
 const productAuthenticityContract = require('../SmartContracts/smartContractHelper');
+const User = require('../models/User');
 
 
 // Generate a product id
@@ -35,6 +36,7 @@ router.post('/createproduct', auth, checkRole('manufacturer'), async (req, res) 
             name: req.body.name,
             description: req.body.description,
             manufacturer: req.user._id, 
+            manufacturer_email: req.user.email,
             productId: product_id, 
             product_transaction: result['events'][0]['transactionHash'],
             manufacturer_address: req.user.walletAddress,
@@ -61,6 +63,104 @@ router.get('/productlist', auth, checkRole('manufacturer'), async (req, res) => 
       res.status(500).send({ error: 'Internal Server Error' });
     }
 });
+
+/*
+    Get a list of suppliers
+    GET /api/manufacturer/supplierlist
+*/
+router.get('/supplierlist', auth, checkRole('manufacturer'), async (req, res) => {
+    try {
+        const suppliers  = await User.find({
+             role: { $in: ['manufacturer', 'supplier'] }
+            }).select('email walletAddress');
+        console.log("suppliers fetched");
+        res.status(200).send(suppliers);
+    } catch (error) {
+        res.status(500).send({ error: 'Error Retrieving suppliers' });
+    }
+});
+
+
+/* 
+    Tranfer a Product to a Supplier
+    POST /api/manufacturer/transferproduct
+    {
+        "productID": "Product_id",
+        "supplier_address": "Supplier Address"
+    }
+*/
+router.post('/transferproduct', auth, checkRole('manufacturer'), async (req, res) => {
+    
+    try {
+        console.log("Entered transfer product");
+        const privateKey = req.user.privateKey;
+        const supplier = await User.findOne({ 
+            email: req.body.supplier_email 
+        }).select('walletAddress');
+        const contractInstance = new productAuthenticityContract(privateKey);
+        // const result = await contractInstance.transferProduct(req.body.product_id, supplier.walletAddress);
+        const result = await contractInstance.alterProductHolder(req.body.product_id, supplier.walletAddress);
+        const product = await Product.findOne({ 
+            productId: req.body.product_id 
+        });
+        product.current_holder = supplier.walletAddress;
+        product.product_transaction = result['events'][0]['transactionHash'];
+        console.log(product);
+        await product.save();
+        res.status(200).send(product);
+    } catch (error) {
+        console.error(error);  res.status(403).send(error);
+    }
+});
+
+/*
+    Change the product holder
+    POST /api/manufacturer/changeholder
+    {
+        "productID": "Product_id",
+        "new_holder": "New Holder Address"
+    }
+*/
+router.post('/alterproductholder', auth, checkRole('manufacturer'), async (req, res) => {
+    
+    try {
+        console.log("Entered Manufacturer change holder");
+        const privateKey = req.user.privateKey;
+        const new_address = await User.findOne({ 
+            email: req.body.new_holder 
+        }).select('walletAddress');
+        const contractInstance = new productAuthenticityContract(privateKey);
+        const result = await contractInstance.alterProductHolder(req.body.product_id, new_address.walletAddress);
+        console.log("Product Transfer result");
+        console.log(result);
+        const product = await Product.findOne({ 
+            productId: req.body.product_id 
+        });
+        product.current_holder = new_address.walletAddress;
+        product.product_transaction = result['events'][0]['transactionHash'];
+        await product.save();
+        res.status(200).send(product);
+    } catch (error) {
+        console.error(error); 
+        res.status(403).send(error);
+    }
+});
+
+// /*
+//     Get a all Users
+//     GET /api/manufacturer/allusers
+// */
+// router.get('/allusers', auth, checkRole('manufacturer'), async (req, res) => {
+//     try {
+//         const users  = await User.find({ 
+//             role: { $in: ['manufacturer', 'supplier'] }
+//             }).select('email walletAddress');
+//         console.log("users fetched");
+//         res.status(200).send(users);
+//     } catch (error) {
+//         res.status(500).send({ error: 'Error Retrieving users' });
+//     }
+// });
   
 
 module.exports = router;

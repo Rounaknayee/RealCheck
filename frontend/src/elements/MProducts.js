@@ -1,22 +1,33 @@
 import React, { useReducer, useEffect} from 'react';
 import axios from 'axios';
-import Modal from 'react-modal';
-import QRCode from 'qrcode.react';
+import QRCodeModal from '../QRCodeModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faQrcode } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faQrcode, faCopy, faEdit, faMoneyBillTransfer } from '@fortawesome/free-solid-svg-icons';
+import MEditTransferModal from './MEditTransferModal';
 
 
 const initialState = {
-  products: [],
-  filteredProducts: [],
-  newProduct: { name: '', description: '' },
-  message: '',
-  isLoading: false,
-  isModalOpen: false,
-  selectedProductId: null,
-  searchQuery: '',
+  products: [],                               // List of products
+  filteredProducts: [],                       // List of products filtered by search query
+  newProduct: { name: '', description: '' },  // New product to be added
+  message: '',                                // Message to be displayed
+  isLoading: false,                           // Loading state     
+  isModalOpen: false,                         // Modal state
+  selectedProductId: null,                    // Selected product ID
+  isEditTransferModalOpen: false,             // Edit Transfer Modal state
+  selectedProductForEdit: null,               // Selected product for edit 
+  searchQuery: '',                            // Search query
+  currentPage: 1,
+  productsPerPage: 7,                         // Number of products per page
 };
 
+/*
+  This reducer handles all the state changes in this component.
+  It is a function that takes in the current state and an action, and returns the new state.
+  The action is an object with a type and a payload.
+  The type is a string that describes the action.
+  The payload is the data that is needed to perform the action.
+*/
 function reducer(state, action) {
   switch (action.type) {
     case 'SET_PRODUCTS':
@@ -33,15 +44,21 @@ function reducer(state, action) {
       return { ...state, selectedProductId: action.payload };
     case 'SET_SEARCH_QUERY':
       return { ...state, searchQuery: action.payload };
-      case 'FILTER_PRODUCTS':
-        const searchQueryLower = state.searchQuery.toLowerCase();
-        return {
-          ...state,
-          filteredProducts: state.products.filter(product =>
-            product.name.toLowerCase().includes(searchQueryLower) ||
-            product.description.toLowerCase().includes(searchQueryLower)
-          )
-        };
+    case 'SET_EDIT_TRANSFER_MODAL_OPEN':
+      return { ...state, isEditTransferModalOpen: action.payload };
+    case 'SET_SELECTED_PRODUCT_FOR_EDIT':
+      return { ...state, selectedProductForEdit: action.payload };
+    case 'SET_CURRENT_PAGE':
+        return { ...state, currentPage: action.payload };
+    case 'FILTER_PRODUCTS':
+      const searchQueryLower = state.searchQuery.toLowerCase();
+      return {
+        ...state,
+        filteredProducts: state.products.filter(product =>
+          product.name.toLowerCase().includes(searchQueryLower) ||
+          product.description.toLowerCase().includes(searchQueryLower)
+        )
+      };
     default:
       return state;
   }
@@ -99,6 +116,43 @@ const MProducts = () => {
     dispatch({ type: 'FILTER_PRODUCTS' });
   };
 
+  const openEditTransferModal = (product) => {
+    dispatch({ type: 'SET_SELECTED_PRODUCT_FOR_EDIT', payload: product });
+    dispatch({ type: 'SET_EDIT_TRANSFER_MODAL_OPEN', payload: true });
+  };
+  
+  const closeEditTransferModal = () => {
+    dispatch({ type: 'SET_EDIT_TRANSFER_MODAL_OPEN', payload: false });
+  };
+
+  // Calculate the displayed products
+  const indexOfLastProduct = state.currentPage * state.productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - state.productsPerPage;
+  const currentProducts = state.filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  // Change page
+  const paginate = (pageNumber) => {
+    dispatch({ type: 'SET_CURRENT_PAGE', payload: pageNumber });
+  };
+
+
+  const truncateString = (str, num) => {
+    if (str.length <= num) {
+      return str;
+    }
+    return str.slice(0, num) + '...';
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Copied to clipboard');
+    }).catch((err) => {
+      console.error('Could not copy text: ', err);
+    });
+  };
+  
+  
+
   return (
     <div className="p-4 bg-teal-50">
       {/* Add Product Form */}
@@ -133,47 +187,106 @@ const MProducts = () => {
             <th className="p-2">Description</th>
             <th className="p-2">Product ID</th>
             <th className="p-2">QR</th>
+            <th className="p-2">Transfer</th>
+            <th className="p-2">Current Holder</th>
             <th className="p-2">Product Transaction</th>
-            
           </tr>
         </thead>
         <tbody>
-        {state.filteredProducts.map((product, index) => (
+        {currentProducts.map((product, index) => (
             <tr key={index} className="border-b">
-              {/* ... [product data cells] */}
               <td className="p-2">{product.name}</td>
               <td className="p-2">{product.description}</td>
               <td className="p-2">{product.productId}</td>
-              <td className="p-2">
-                <button className="px-2 py-1 bg-teal-600 hover:bg-teal-800 rounded text-white" onClick={() => openModal(product.productId)}>
+
+              {/* QR CODE DISPLAY BUTTON */}
+              <td className="p-2 cursor-pointer">
+                <button className="px-2 py-1 bg-teal-600 hover:bg-teal-800 rounded text-white" 
+                onClick={() => openModal(product.productId)}>
                 <FontAwesomeIcon icon={faQrcode} />       
                 </button>
               </td>
-              <td className="p-2">{product.product_transaction}</td>
+
+              {/* TRANSFER BUTTON
+              <td className="p-2 cursor-pointer">
+                <button className="px-2 py-1 bg-teal-600 hover:bg-teal-800 rounded text-white"
+                onClick={() => openEditTransferModal(product)}>
+                  <FontAwesomeIcon icon={faMoneyBillTransfer} />
+                </button>
+              </td> */}
+
+              {/* EDIT BUTTON */}
+              <td className="p-2 cursor-pointer">
+                <button className="px-2 py-1 bg-teal-600 hover:bg-teal-800 rounded text-white"
+                onClick={() => openEditTransferModal(product)}>
+                  <FontAwesomeIcon icon={faEdit} />
+                </button>
+              </td>
+
+              {/* COPY CLIPBOARD FOR WALLET ADDRESS */}
+              <td className="p-2 cursor-pointer " >
+              <button 
+                  className="px-2 py-1 bg-teal-600 hover:bg-teal-800 rounded text-white" 
+                  onClick={() => copyToClipboard(product.current_holder)}>
+                  <FontAwesomeIcon icon={faCopy} />
+                </button>
+                <span className="ml-2">
+                {product.current_holder}
+                {/* {truncateString(product.current_holder, 15)} */}
+                </span>
+              </td>
+
+              {/* COPY CLIPBOARD FOR TRANSACTION ID */}
+              <td className="p-2 cursor-pointer flex items-start" title="Click to copy">
+                <button 
+                  className="px-2 py-1 bg-teal-600 hover:bg-teal-800 rounded text-white" 
+                  onClick={() => copyToClipboard(product.product_transaction)}
+                >
+                  <FontAwesomeIcon icon={faCopy} />
+                </button>
+                <span className="ml-2">
+                  {truncateString(product.product_transaction, 20)}
+                </span>
+              </td>
+
+
+              
+
+
             </tr>
           ))}
         </tbody>
       </table>
 
+      {/* Pagination */}
+      <div className="flex justify-center mt-4">
+        <div className="inline-flex">
+          {[...Array(Math.ceil(state.filteredProducts.length / state.productsPerPage)).keys()].map(number => (
+            <button
+              key={number}
+              onClick={() => paginate(number + 1)}
+              className={`px-4 py-2 mx-1 ${state.currentPage === number + 1 ? 'bg-teal-600 text-white' : 'bg-white border border-teal-600 text-teal-600'} rounded`}
+            >
+              {number + 1}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* QR Code Modal */}
-      <Modal 
+
+      <QRCodeModal 
         isOpen={state.isModalOpen} 
         onRequestClose={closeModal}
-        className="fixed inset-0 flex items-center justify-center p-4"
-        overlayClassName="fixed inset-0 bg-white bg-opacity-75"
-      >
-        <div className="bg-white border-2 border-teal-600 rounded-lg shadow-xl p-3 items-center justify-center">
-        <div className='justify-end'>
-        <button 
-            onClick={closeModal} 
-            className=" absolright-0 mb-2 px-2 py-1 border border-teal-600 text-teal-600 hover:bg-teal-700 hover:text-white transition-colors rounded"
-          >
-            X
-        </button>
-        </div>
-        {state.selectedProductId && <QRCode value={ state.selectedProductId} fgColor="#004d40" />}
-        </div>
-      </Modal>
+        productId={state.selectedProductId}
+        color="#004d40" // You can pass the color as a prop
+      />
+
+      <MEditTransferModal
+        isOpen={state.isEditTransferModalOpen}
+        onRequestClose={closeEditTransferModal}
+        product={state.selectedProductForEdit}
+      />
     </div>
   );
 };

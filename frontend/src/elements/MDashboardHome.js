@@ -24,7 +24,7 @@ function reducer(state, action) {
 
 const MDashboardHome = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { user } = state;
+  // const { user } = state;
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -45,24 +45,24 @@ const MDashboardHome = () => {
       }
     };
 
-    const fetchEthBalanceAndMarketValues = async () => {
-      const storedMarketValues = sessionStorage.getItem('marketValues');
-      if (storedMarketValues) {
-        dispatch({ type: 'SET_MARKET_VALUES', payload: JSON.parse(storedMarketValues) });
-      } else {
-        try {
-          const marketData = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd,btc');
-          const marketValues = {
-            ethToUsd: marketData.data.ethereum.usd,
-            ethToBtc: marketData.data.ethereum.btc
-          };
-          sessionStorage.setItem('marketValues', JSON.stringify(marketValues));
-          dispatch({ type: 'SET_MARKET_VALUES', payload: marketValues });
-        } catch (error) {
-          console.error('Error fetching market values:', error);
-        }
-      }
-    };
+    // const fetchEthBalanceAndMarketValues = async () => {
+    //   const storedMarketValues = sessionStorage.getItem('marketValues');
+    //   if (storedMarketValues) {
+    //     dispatch({ type: 'SET_MARKET_VALUES', payload: JSON.parse(storedMarketValues) });
+    //   } else {
+    //     try {
+    //       const marketData = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd,btc');
+    //       const marketValues = {
+    //         ethToUsd: marketData.data.ethereum.usd,
+    //         ethToBtc: marketData.data.ethereum.btc
+    //       };
+    //       sessionStorage.setItem('marketValues', JSON.stringify(marketValues));
+    //       dispatch({ type: 'SET_MARKET_VALUES', payload: marketValues });
+    //     } catch (error) {
+    //       console.error('Error fetching market values:', error);
+    //     }
+    //   }
+    // };
 
     
     fetchUserDetails();
@@ -74,7 +74,7 @@ const MDashboardHome = () => {
   }
 
   return (
-    <div className=" min-h-screen flex flex-col ">
+    <div className=" flex flex-col ">
       {/* Greeting with User's Email */}
       <h1 className="my-6 w-full border-l-4 border-teal-800 bg-teal-50 p-3 flex">
         Hi, <span className="font-bold text-teal-700">{state.user.email}</span> !

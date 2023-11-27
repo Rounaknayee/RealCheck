@@ -33,7 +33,7 @@ const SignIn = () => {
             });
         console.log(response);
         const { token } = response.data;
-        localStorage.setItem('token', token); // or sessionStorage.setItem('token', token);
+        sessionStorage.setItem('token', token); // or sessionStorage.setItem('token', token);
         const userRole = response.data.user.role;
         console.log(userRole);
         if(userRole === 'manufacturer'){

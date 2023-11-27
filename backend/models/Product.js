@@ -5,6 +5,9 @@ const productSchema = new mongoose.Schema({
   description: { type: String, required: true },
   productId: { type: String, required: true, unique: true },
   product_transaction: { type: String, required: true, unique: true },
+  manufacturer_address: { type: String, required: true },
+  manufacturer_email: { type: String, required: true },
+  current_holder: { type: String, required: true },
   manufacturer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
