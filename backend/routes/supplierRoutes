@@ -3,25 +3,82 @@ const User = require('../models/User');
 const Product = require('../models/Product');
 const jwt = require('jsonwebtoken');
 const { auth, checkRole } = require('../middleware/auth');
-// const {auth} = require('../middleware/auth'); // Import auth middleware and destructured auth function
 const router = new express.Router();
+const productAuthenticityContract = require('../SmartContracts/smartContractHelper');
+
 
 /* 
-    GET Supplier products
+    GET Supplier owned products
     GET /api/supplier/prouctlist
 */
 router.get('/productlist',auth, checkRole('supplier'), async (req, res) => {
     console.log("product list");
     try {
-        console.log("product list");
-        console.log(req.user);
-
+        console.log("Entered: Supplier product list");
         const products = await Product.find({ current_holder: req.user.walletAddress });
         res.status(200).send(products);
     } catch (error) {
-        console.error(error);  res.status(403).send(error);
+        console.error(error);  
+        res.status(403).send(error);
     }
 });
+
+/*
+    POST Transfer a product to another supplier
+    POST /api/supplier/transferproduct
+    {
+        "productID": "Product_id",
+        "supplier_address": "Supplier Address"
+    }
+*/
+router.post('/transferproduct', auth, checkRole('supplier'), async (req, res) => {
+    try {
+        console.log("Entered: Supplier transfer product");
+        const privateKey = req.user.privateKey;
+        const supplier = await User.findOne({ 
+            email: req.body.supplier_email 
+        }).select('walletAddress');
+        const contractInstance = new productAuthenticityContract(privateKey);
+        console.log("Contract instance created");
+        console.log(req.body);
+        console.log(supplier.walletAddress);
+
+        const result = await contractInstance.transferProduct(req.body.product_id, supplier.walletAddress);
+        const product = await Product.findOne({ 
+            productId: req.body.product_id 
+        });
+        product.current_holder = supplier.walletAddress;
+        product.product_transaction = result.transactionHash;
+        await product.save();
+        res.status(201).send(product);
+    } catch (error) {
+        console.error(error);  
+        res.status(403).send(error);
+    }
+});
+
+
+/* 
+    GET list of suppliers except self
+    GET /api/supplier/supplierlist
+*/
+router.get('/supplierlist',auth, checkRole('supplier'), async (req, res) => {
+    try {
+        console.log("Entered: Supplier's supplier list");
+        const suppliers  = await User.find({
+            email: { $ne: req.user.email }, // Exclude self
+            role: 'supplier' 
+            }).select('email walletAddress');
+
+        console.log("suppliers fetched");
+        res.status(200).send(suppliers);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ error: 'Error Retrieving suppliers' });
+    }
+});
+
+
     
 
 module.exports = router;

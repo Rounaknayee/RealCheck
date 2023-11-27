@@ -8,7 +8,7 @@ import MProducts from './elements/MProducts';
 import MSuppliers from './elements/MSuppliers';
 import MProfile from './elements/MProfile';
 import SupplierDashboard from './elements/SupplierDashboard.js';
-import SDashboardHome from './elements/SDashboardHome.js';
+// import SDashboardHome from './elements/SDashboardHome.js';
 import SProducts from './elements/SProducts.js';
 import SProfile from './elements/SProfile.js';
 import Scan from './elements/Scan.js';

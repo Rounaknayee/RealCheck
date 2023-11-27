@@ -5,7 +5,7 @@ import SignUp from './SignUp';
 import ConnectionTest from './ConnectionTest';
 import SignIn from './SignIn';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Scan from './elements/Scan';
 
 function LandingPage() {
   const [activeComponent, setActiveComponent] = useState('connectionTest');
@@ -17,6 +17,8 @@ function LandingPage() {
         return <SignUp />;
       case 'signIn':
         return <SignIn />;
+      case 'scan':
+        return <Scan />;
       default:
         return null;
     }
@@ -35,9 +37,13 @@ function LandingPage() {
         <button onClick={() => setActiveComponent('signUp')} className="font-semibold hover:bg-teal-700 p-2">
           Sign Up
         </button>
-        <Link to="/scan" className="font-semibold hover:bg-teal-700 p-2">
+        <button onClick={()=> setActiveComponent('scan')} className="font-semibold hover:bg-teal-700 p-2">
           Scan
-        </Link>
+        </button>
+
+        {/* <Link to="/scan" className="font-semibold hover:bg-teal-700 p-2">
+          Scan
+        </Link> */}
       </div>
 
       {/* Main Content */}

@@ -2,7 +2,7 @@ import React, { useReducer, useEffect} from 'react';
 import axios from 'axios';
 import QRCodeModal from '../QRCodeModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faQrcode, faCopy, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faQrcode, faCopy, faEdit, faMoneyBillTransfer } from '@fortawesome/free-solid-svg-icons';
 import MEditTransferModal from './MEditTransferModal';
 
 
@@ -17,6 +17,8 @@ const initialState = {
   isEditTransferModalOpen: false,             // Edit Transfer Modal state
   selectedProductForEdit: null,               // Selected product for edit 
   searchQuery: '',                            // Search query
+  currentPage: 1,
+  productsPerPage: 7,                         // Number of products per page
 };
 
 /*
@@ -46,6 +48,8 @@ function reducer(state, action) {
       return { ...state, isEditTransferModalOpen: action.payload };
     case 'SET_SELECTED_PRODUCT_FOR_EDIT':
       return { ...state, selectedProductForEdit: action.payload };
+    case 'SET_CURRENT_PAGE':
+        return { ...state, currentPage: action.payload };
     case 'FILTER_PRODUCTS':
       const searchQueryLower = state.searchQuery.toLowerCase();
       return {
@@ -121,6 +125,17 @@ const MProducts = () => {
     dispatch({ type: 'SET_EDIT_TRANSFER_MODAL_OPEN', payload: false });
   };
 
+  // Calculate the displayed products
+  const indexOfLastProduct = state.currentPage * state.productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - state.productsPerPage;
+  const currentProducts = state.filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  // Change page
+  const paginate = (pageNumber) => {
+    dispatch({ type: 'SET_CURRENT_PAGE', payload: pageNumber });
+  };
+
+
   const truncateString = (str, num) => {
     if (str.length <= num) {
       return str;
@@ -172,13 +187,13 @@ const MProducts = () => {
             <th className="p-2">Description</th>
             <th className="p-2">Product ID</th>
             <th className="p-2">QR</th>
-            <th className="p-2">Edit</th>
+            <th className="p-2">Transfer</th>
             <th className="p-2">Current Holder</th>
             <th className="p-2">Product Transaction</th>
           </tr>
         </thead>
         <tbody>
-        {state.filteredProducts.map((product, index) => (
+        {currentProducts.map((product, index) => (
             <tr key={index} className="border-b">
               <td className="p-2">{product.name}</td>
               <td className="p-2">{product.description}</td>
@@ -191,6 +206,14 @@ const MProducts = () => {
                 <FontAwesomeIcon icon={faQrcode} />       
                 </button>
               </td>
+
+              {/* TRANSFER BUTTON
+              <td className="p-2 cursor-pointer">
+                <button className="px-2 py-1 bg-teal-600 hover:bg-teal-800 rounded text-white"
+                onClick={() => openEditTransferModal(product)}>
+                  <FontAwesomeIcon icon={faMoneyBillTransfer} />
+                </button>
+              </td> */}
 
               {/* EDIT BUTTON */}
               <td className="p-2 cursor-pointer">
@@ -209,6 +232,7 @@ const MProducts = () => {
                 </button>
                 <span className="ml-2">
                 {product.current_holder}
+                {/* {truncateString(product.current_holder, 15)} */}
                 </span>
               </td>
 
@@ -221,7 +245,7 @@ const MProducts = () => {
                   <FontAwesomeIcon icon={faCopy} />
                 </button>
                 <span className="ml-2">
-                  {truncateString(product.product_transaction, 14)}
+                  {truncateString(product.product_transaction, 20)}
                 </span>
               </td>
 
@@ -234,11 +258,26 @@ const MProducts = () => {
         </tbody>
       </table>
 
+      {/* Pagination */}
+      <div className="flex justify-center mt-4">
+        <div className="inline-flex">
+          {[...Array(Math.ceil(state.filteredProducts.length / state.productsPerPage)).keys()].map(number => (
+            <button
+              key={number}
+              onClick={() => paginate(number + 1)}
+              className={`px-4 py-2 mx-1 ${state.currentPage === number + 1 ? 'bg-teal-600 text-white' : 'bg-white border border-teal-600 text-teal-600'} rounded`}
+            >
+              {number + 1}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* QR Code Modal */}
 
       <QRCodeModal 
         isOpen={state.isModalOpen} 
-        onRequestClose={() => dispatch({ type: 'SET_MODAL_OPEN', payload: false })}
+        onRequestClose={closeModal}
         productId={state.selectedProductId}
         color="#004d40" // You can pass the color as a prop
       />
