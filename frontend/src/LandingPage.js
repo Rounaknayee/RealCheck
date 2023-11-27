@@ -29,7 +29,7 @@ function LandingPage() {
       {/* Top Navigation Bar */}
       <div className="w-full bg-teal-800 text-white p-4 flex justify-center space-x-4">
         <button onClick={() => setActiveComponent('connectionTest')} className="font-semibold hover:bg-teal-700 p-2">
-          Test Connection
+          Home
         </button>
         <button onClick={() => setActiveComponent('signIn')} className="font-semibold hover:bg-teal-700 p-2">
           Login
