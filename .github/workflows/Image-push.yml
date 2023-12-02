@@ -36,19 +36,19 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Log in to Amazon ECR Public
-      uses: aws-actions/amazon-ecr-login@v2
-      with:
-        registries: public.ecr.aws/o4p6q9l0
 
-    - name: Tag Backend Image for Amazon ECR Public
-      run: docker tag rounaknayee/realcheck-backend:latest public.ecr.aws/o4p6q9l0/realcheck-backend:latest
+    -   name: Login to Amazon ECR Public
+        run: |
+          aws ecr-public get-login-password --region ${{secrets.AWS_REGION}} | docker login --username AWS --password-stdin public.ecr.aws/o4p6q9l0
 
-    - name: Push Backend Image to Amazon ECR Public
-      run: docker push public.ecr.aws/o4p6q9l0/realcheck-backend:latest
+    -   name: Tag Backend Image for Amazon ECR Public
+        run: docker tag rounaknayee/realcheck-backend:latest public.ecr.aws/o4p6q9l0/realcheck-backend:latest
 
-    - name: Tag Frontend Image for Amazon ECR Public
-      run: docker tag rounaknayee/realcheck-frontend:latest public.ecr.aws/o4p6q9l0/realcheck-frontend:latest
+    -   name: Push Backend Image to Amazon ECR Public
+        run: docker push public.ecr.aws/o4p6q9l0/realcheck-backend:latest
 
-    - name: Push Frontend Image to Amazon ECR Public
-      run: docker push public.ecr.aws/o4p6q9l0/realcheck-frontend:latest
+    -   name: Tag Frontend Image for Amazon ECR Public
+        run: docker tag rounaknayee/realcheck-frontend:latest public.ecr.aws/o4p6q9l0/realcheck-frontend:latest
+
+    -   name: Push Frontend Image to Amazon ECR Public
+        run: docker push public.ecr.aws/o4p6q9l0/realcheck-frontend:latest
