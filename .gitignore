@@ -140,3 +140,25 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Terraform directory to ignore
+**/.terraform/*
+
+# Ignore Terraform lock files
+*.tfstate
+*.tfstate.*
+tfstate*
+
+# Ignore Terraform plan output
+*.tfplan
+*.tfplan.*
+
+# Ignore override files as they are usually used for local dev
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
