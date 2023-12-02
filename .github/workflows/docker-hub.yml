@@ -3,7 +3,7 @@ name: Build and Push Docker Images
 on:
   push:
     branches: [ main ]  # Trigger on push to main branch
-  pull:
+  pull_request:
     branches: [ main ]  # Trigger on pull request to main branch
 
 jobs:
@@ -31,6 +31,6 @@ jobs:
 
     # Build and Push Frontend Image
     - name: Build Frontend Docker Image
-      run: docker build -t rounaknayee/realcheck:latest -f ./frontend/prod-frontend.Dockerfile ./frontend
+      run: docker build -t rounaknayee/realcheck-frontend:latest -f ./frontend/prod-frontend.Dockerfile ./frontend
     - name: Push Frontend Docker Image
       run: docker push rounaknayee/realcheck-frontend:latest
