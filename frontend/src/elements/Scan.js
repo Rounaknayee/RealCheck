@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { QrReader } from 'react-qr-reader';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
@@ -122,14 +121,14 @@ const Scan = () => {
 
       {isScanning && (
         <div className="mb-4">
-          <QrReader
+          {/* <QrReader
             key={isScanning} // Force re-mount on re-render
             delay={300}
             onError={handleError}
             onResult={handleScan}
             // onScan={handleScan}
             style={{ width: '100%' }}
-          />
+          /> */}
         </div>
       )}
     </div>
