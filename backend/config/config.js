@@ -7,8 +7,7 @@ const config = {
   jwtSecret: process.env.JWT_SECRET, 
   contractAddress: process.env.CONTRACT_ADDRESS,
   alchemyApiKey: process.env.ALCHEMY_API_KEY,
-  alchemyProviderURL: process.env.ALCHEMY_API_URL,  
-  
+  alchemyProviderURL: process.env.ALCHEMY_API_URL,
 };
 
 module.exports = config;

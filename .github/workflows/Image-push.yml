@@ -1,0 +1,49 @@
+name: Build and Push Docker Images to Docker Hub and Amazon ECR Public
+
+on:
+  push:
+    branches: [ main ]  # Trigger on push to main branch
+    
+jobs:
+  build-and-push-docker-images:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+    - name: Build Backend Docker Image
+      run: docker build -t rounaknayee/realcheck-backend:latest -f ./backend/prod-backend.Dockerfile ./backend
+
+    - name: Push Backend Docker Image to Docker Hub
+      run: docker push rounaknayee/realcheck-backend:latest
+
+    - name: Build Frontend Docker Image
+      run: docker build -t rounaknayee/realcheck-frontend:latest -f ./frontend/prod-frontend.Dockerfile ./frontend
+
+    - name: Push Frontend Docker Image to Docker Hub
+      run: docker push rounaknayee/realcheck-frontend:latest
+
+    - name: Log in to Amazon ECR Public
+      uses: aws-actions/amazon-ecr-login@v1
+      with:
+        registries: public.ecr.aws/o4p6q9l0
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: Tag Backend Image for Amazon ECR Public
+      run: docker tag rounaknayee/realcheck-backend:latest public.ecr.aws/o4p6q9l0/realcheck-backend:latest
+
+    - name: Push Backend Image to Amazon ECR Public
+      run: docker push public.ecr.aws/o4p6q9l0/realcheck-backend:latest
+
+    - name: Tag Frontend Image for Amazon ECR Public
+      run: docker tag rounaknayee/realcheck-frontend:latest public.ecr.aws/o4p6q9l0/realcheck-frontend:latest
+
+    - name: Push Frontend Image to Amazon ECR Public
+      run: docker push public.ecr.aws/o4p6q9l0/realcheck-frontend:latest

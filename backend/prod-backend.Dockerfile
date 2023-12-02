@@ -15,11 +15,10 @@ COPY . .
 
 # Set environment variables
 ENV NODE_ENV=production
-ENV PORT=5001
 # Add any other environment variable you need here
 
 # Expose the port the app runs on
 EXPOSE 5001
 
 # Command to start the application
-CMD ["node", "app.js"] # Replace "app.js" with your main server file
+CMD ["node", "server.js"]
