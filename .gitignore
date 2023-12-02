@@ -161,10 +161,4 @@ override.tf.json
 
 # Ignore CLI configuration files
 .terraformrc
-terraform.rc.terraform/
-infra_backend/.terraform/providers/registry.terraform.io/hashicorp/aws/5.29.0/darwin_arm64/terraform-provider-aws_v5.29.0_x5
-infra_backend/.terraform/providers/registry.terraform.io/hashicorp/aws/5.29.0/darwin_arm64/terraform-provider-aws_v5.29.0_x5
-
-
-# .gitignore
-.terraform/
+terraform.rc
