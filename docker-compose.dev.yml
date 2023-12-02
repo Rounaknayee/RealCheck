@@ -4,6 +4,12 @@
 version: '3'
 
 services:
+  # ganache:
+  #   container_name: ganache-realcheck
+  #   image: trufflesuite/ganache-cli
+  #   command: ganache-cli -h 0.0.0.0
+  #   ports:
+      # - "8545:8545"
 
   backend:
     container_name: backend-realcheck
