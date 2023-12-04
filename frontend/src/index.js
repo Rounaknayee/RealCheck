@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import axios from 'axios';
 axios.defaults.baseURL = process.env.BACKEND_URL || 'http://localhost:5001';
 
+
 // axios.interceptors for adding the token to every request
 axios.interceptors.request.use(
   config => {
