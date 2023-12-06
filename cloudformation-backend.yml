@@ -1,0 +1,229 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  BackendService:
+    DependsOn:
+    - BackendTCP5001Listener
+    Properties:
+      Cluster:
+        Fn::GetAtt:
+        - Cluster
+        - Arn
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DeploymentController:
+        Type: ECS
+      DesiredCount: 1
+      LaunchType: FARGATE
+      LoadBalancers:
+      - ContainerName: backend
+        ContainerPort: 5001
+        TargetGroupArn:
+          Ref: BackendTCP5001TargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+          - Ref: DefaultNetwork
+          Subnets:
+          - subnet-0cc73d518f54c613f
+          - subnet-09daee9dc1a77b5d5
+          - subnet-0dc268c0bf72e1571
+          - subnet-0d2e6a68319094680
+          - subnet-099eee8776715931a
+          - subnet-0150365d5581f9a72
+      PlatformVersion: 1.4.0
+      PropagateTags: SERVICE
+      SchedulingStrategy: REPLICA
+      ServiceRegistries:
+      - RegistryArn:
+          Fn::GetAtt:
+          - BackendServiceDiscoveryEntry
+          - Arn
+      Tags:
+      - Key: com.docker.compose.project
+        Value: finalsemesterproject
+      - Key: com.docker.compose.service
+        Value: backend
+      TaskDefinition:
+        Ref: BackendTaskDefinition
+    Type: AWS::ECS::Service
+  BackendServiceDiscoveryEntry:
+    Properties:
+      Description: '"backend" service discovery entry in Cloud Map'
+      DnsConfig:
+        DnsRecords:
+        - TTL: 60
+          Type: A
+        RoutingPolicy: MULTIVALUE
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+      Name: backend
+      NamespaceId:
+        Ref: CloudMap
+    Type: AWS::ServiceDiscovery::Service
+  BackendTCP5001Listener:
+    Properties:
+      DefaultActions:
+      - ForwardConfig:
+          TargetGroups:
+          - TargetGroupArn:
+              Ref: BackendTCP5001TargetGroup
+        Type: forward
+      LoadBalancerArn:
+        Ref: LoadBalancer
+      Port: 5001
+      Protocol: TCP
+    Type: AWS::ElasticLoadBalancingV2::Listener
+  BackendTCP5001TargetGroup:
+    Properties:
+      Port: 5001
+      Protocol: TCP
+      Tags:
+      - Key: com.docker.compose.project
+        Value: finalsemesterproject
+      TargetType: ip
+      VpcId: vpc-0e48a7a534fd894ee
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+  BackendTaskDefinition:
+    Properties:
+      ContainerDefinitions:
+      - Command:
+        - us-east-1.compute.internal
+        - finalsemesterproject.local
+        Essential: false
+        Image: docker/ecs-searchdomain-sidecar:1.0
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: finalsemesterproject
+        Name: Backend_ResolvConf_InitContainer
+      - DependsOn:
+        - Condition: SUCCESS
+          ContainerName: Backend_ResolvConf_InitContainer
+        Environment:
+        - Name: ALCHEMY_API_KEY
+          Value: 5K7HnIb6qo0mvi3cEh5N9r7IBdTgMCrT
+        - Name: ALCHEMY_API_URL
+          Value: https://eth-sepolia.g.alchemy.com/v2/5K7HnIb6qo0mvi3cEh5N9r7IBdTgMCrT
+        - Name: JWT_SECRET
+          Value: rounak-@-realcheck
+        - Name: MONGODB_URI
+          Value: mongodb+srv://admin:admin%40123456789@rccluster.z2zaprq.mongodb.net/realcheck
+        - Name: NODE_ENV
+          Value: development
+        - Name: PORT
+          Value: "5001"
+        Essential: true
+        Image: docker.io/rounaknayee/realcheck-backend:latest@sha256:df80fd982435aba184cf4126eeaa86e6143c40bc4e9c2a8e8fd093b6cdc1779d
+        LinuxParameters: {}
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: finalsemesterproject
+        Name: backend
+        PortMappings:
+        - ContainerPort: 5001
+          HostPort: 5001
+          Protocol: tcp
+      Cpu: "256"
+      ExecutionRoleArn:
+        Ref: BackendTaskExecutionRole
+      Family: finalsemesterproject-backend
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - FARGATE
+    Type: AWS::ECS::TaskDefinition
+  BackendTaskExecutionRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Condition: {}
+          Effect: Allow
+          Principal:
+            Service: ecs-tasks.amazonaws.com
+        Version: 2012-10-17
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      Tags:
+      - Key: com.docker.compose.project
+        Value: finalsemesterproject
+      - Key: com.docker.compose.service
+        Value: backend
+    Type: AWS::IAM::Role
+  CloudMap:
+    Properties:
+      Description: Service Map for Docker Compose project finalsemesterproject
+      Name: finalsemesterproject.local
+      Vpc: vpc-0e48a7a534fd894ee
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+  Cluster:
+    Properties:
+      ClusterName: finalsemesterproject
+      Tags:
+      - Key: com.docker.compose.project
+        Value: finalsemesterproject
+    Type: AWS::ECS::Cluster
+  Default5001Ingress:
+    Properties:
+      CidrIp: 0.0.0.0/0
+      Description: backend:5001/tcp on default network
+      FromPort: 5001
+      GroupId:
+        Ref: DefaultNetwork
+      IpProtocol: TCP
+      ToPort: 5001
+    Type: AWS::EC2::SecurityGroupIngress
+  DefaultNetwork:
+    Properties:
+      GroupDescription: finalsemesterproject Security Group for default network
+      Tags:
+      - Key: com.docker.compose.project
+        Value: finalsemesterproject
+      - Key: com.docker.compose.network
+        Value: finalsemesterproject_default
+      VpcId: vpc-0e48a7a534fd894ee
+    Type: AWS::EC2::SecurityGroup
+  DefaultNetworkIngress:
+    Properties:
+      Description: Allow communication within network default
+      GroupId:
+        Ref: DefaultNetwork
+      IpProtocol: "-1"
+      SourceSecurityGroupId:
+        Ref: DefaultNetwork
+    Type: AWS::EC2::SecurityGroupIngress
+  LoadBalancer:
+    Properties:
+      LoadBalancerAttributes:
+      - Key: load_balancing.cross_zone.enabled
+        Value: "true"
+      Scheme: internet-facing
+      Subnets:
+      - subnet-0cc73d518f54c613f
+      - subnet-09daee9dc1a77b5d5
+      - subnet-0dc268c0bf72e1571
+      - subnet-0d2e6a68319094680
+      - subnet-099eee8776715931a
+      - subnet-0150365d5581f9a72
+      Tags:
+      - Key: com.docker.compose.project
+        Value: finalsemesterproject
+      Type: network
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+  LogGroup:
+    Properties:
+      LogGroupName: /docker-compose/finalsemesterproject
+    Type: AWS::Logs::LogGroup
