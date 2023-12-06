@@ -1,0 +1,26 @@
+#  run docker compose command
+#  docker-compose -f docker-frontend.yml up
+
+
+# docker context use desktop-linux
+# docker login
+# docker-compose -f docker-frontend.yml build --no-cache
+# docker-compose -f docker-frontend.yml push
+# source setenv.sh
+# docker context use realcheck-ecs-context
+# docker-compose -f docker-frontend.yml up
+
+
+version: '3'
+
+services:
+  frontend:
+    image: rounaknayee/realcheck-frontend:latest
+    container_name: frontend-realcheck
+    build:
+      context: ./frontend
+      dockerfile: prod-frontend.Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - BACKEND_URL=http://finals-loadb-nv5y5kpihan3-4cc2ee7c5eff5947.elb.us-east-1.amazonaws.com:5001

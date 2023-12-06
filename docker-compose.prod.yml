@@ -1,0 +1,32 @@
+#  run docker compose command
+#  docker-compose -f docker-compose.prod.yml up
+
+version: '3'
+
+services:
+  backend:
+    image: rounaknayee/realcheck-backend:latest
+    container_name: backend-realcheck
+    build: 
+      context: ./backend
+      dockerfile: prod-backend.Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb+srv://admin:admin%40123456789@rccluster.z2zaprq.mongodb.net/realcheck
+      - PORT=5001
+      - JWT_SECRET=rounak-@-realcheck
+      - ALCHEMY_API_KEY=5K7HnIb6qo0mvi3cEh5N9r7IBdTgMCrT
+      - ALCHEMY_API_URL=https://eth-sepolia.g.alchemy.com/v2/5K7HnIb6qo0mvi3cEh5N9r7IBdTgMCrT
+
+  frontend:
+    image: rounaknayee/realcheck-frontend:latest
+    container_name: frontend-realcheck
+    build:
+      context: ./frontend
+      dockerfile: prod-frontend.Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - BACKEND_URL=http://localhost:5001

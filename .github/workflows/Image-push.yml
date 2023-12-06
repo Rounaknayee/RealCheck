@@ -3,9 +3,11 @@ name: Build and Push Docker Images to Docker Hub and Amazon ECR Public
 on:
   push:
     branches: [ main ]  # Trigger on push to main branch
+    paths:
+      - 'backend/**'
 
 jobs:
-  build-and-push-docker-images:
+  build-and-push-backend-docker-images:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
@@ -17,17 +19,11 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-    - name: Build Backend Docker Image
-      run: docker build -t rounaknayee/realcheck-backend:latest -f ./backend/prod-backend.Dockerfile ./backend
-
-    - name: Push Backend Docker Image to Docker Hub
-      run: docker push rounaknayee/realcheck-backend:latest
-
-    - name: Build Frontend Docker Image
-      run: docker build -t rounaknayee/realcheck-frontend:latest -f ./frontend/prod-frontend.Dockerfile ./frontend
-
-    - name: Push Frontend Docker Image to Docker Hub
-      run: docker push rounaknayee/realcheck-frontend:latest
+    - name: Docker Build Backend Image
+      run: docker-compose -f docker-backend.yml build --no-cache
+    
+    - name: Docker Push Backend Image
+      run: docker-compose -f docker-backend.yml push
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -36,19 +32,51 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
+    - name: Set up Docker context
+      run: |
+        docker context create ecs realcheck-ecs-context --from-env
+        docker context use realcheck-ecs-context
 
-    -   name: Login to Amazon ECR Public
-        run: |
-          aws ecr-public get-login-password --region ${{secrets.AWS_REGION}} | docker login --username AWS --password-stdin public.ecr.aws/o4p6q9l0
+    - name: Deploy to ECS using Docker Compose
+      run: |
+        docker-compose -f docker-backend.yml up
 
-    -   name: Tag Backend Image for Amazon ECR Public
-        run: docker tag rounaknayee/realcheck-backend:latest public.ecr.aws/o4p6q9l0/realcheck-backend:latest
+    # - name: Build Backend Docker Image
+    #   run: docker build -t rounaknayee/realcheck-backend:latest -f ./backend/prod-backend.Dockerfile ./backend
 
-    -   name: Push Backend Image to Amazon ECR Public
-        run: docker push public.ecr.aws/o4p6q9l0/realcheck-backend:latest
+    # - name: Push Backend Docker Image to Docker Hub
+    #   run: docker push rounaknayee/realcheck-backend:latest
 
-    -   name: Tag Frontend Image for Amazon ECR Public
-        run: docker tag rounaknayee/realcheck-frontend:latest public.ecr.aws/o4p6q9l0/realcheck-frontend:latest
+    # - name: Build Frontend Docker Image
+    #   run: docker build -t rounaknayee/realcheck-frontend:latest -f ./frontend/prod-frontend.Dockerfile ./frontend
 
-    -   name: Push Frontend Image to Amazon ECR Public
-        run: docker push public.ecr.aws/o4p6q9l0/realcheck-frontend:latest
+    # - name: Push Frontend Docker Image to Docker Hub
+    #   run: docker push rounaknayee/realcheck-frontend:latest
+
+
+    # -   name: Login to Amazon ECR Public
+    #     run: |
+    #       aws ecr-public get-login-password --region | docker login --username AWS --password-stdin public.ecr.aws/o4p6q9l0
+
+    # -   name: Tag Backend Image for Amazon ECR Public
+    #     run: docker tag rounaknayee/realcheck-backend:latest public.ecr.aws/o4p6q9l0/realcheck-backend:latest
+
+    # -   name: Push Backend Image to Amazon ECR Public
+    #     run: docker push public.ecr.aws/o4p6q9l0/realcheck-backend:latest
+
+    # -   name: Tag Frontend Image for Amazon ECR Public
+    #     run: docker tag rounaknayee/realcheck-frontend:latest public.ecr.aws/o4p6q9l0/realcheck-frontend:latest
+
+    # -   name: Push Frontend Image to Amazon ECR Public
+    #     run: docker push public.ecr.aws/o4p6q9l0/realcheck-frontend:latest
+
+  Frontend-Deploy-on-s3:
+    needs: build-and-push-backend-docker-images
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # - name: Configure AWS Credentials
+      
+

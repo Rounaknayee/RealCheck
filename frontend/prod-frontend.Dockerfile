@@ -1,6 +1,6 @@
 # OPTIMIZED Docker chain build for production
 # Use the official Node.js image to build the app
-FROM node:16 AS build
+FROM --platform=linux/amd64 node:16 AS build
 
 # Set the working directory
 WORKDIR /usr/src/app
@@ -18,7 +18,7 @@ COPY . .
 RUN npm run build
 
 # Serve the app using a lightweight node image
-FROM node:16-slim
+FROM --platform=linux/amd64 node:16-slim
 
 WORKDIR /usr/app
 
