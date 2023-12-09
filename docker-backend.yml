@@ -10,6 +10,7 @@
 # docker-compose -f docker-backend.yml up
 
 
+
 version: '3'
 
 services:
@@ -22,9 +23,16 @@ services:
     ports:
       - "5001:5001"
     environment:
-      - NODE_ENV=development
-      - MONGODB_URI=mongodb+srv://admin:admin%40123456789@rccluster.z2zaprq.mongodb.net/realcheck
-      - PORT=5001
-      - JWT_SECRET=rounak-@-realcheck
-      - ALCHEMY_API_KEY=5K7HnIb6qo0mvi3cEh5N9r7IBdTgMCrT
-      - ALCHEMY_API_URL=https://eth-sepolia.g.alchemy.com/v2/5K7HnIb6qo0mvi3cEh5N9r7IBdTgMCrT
+      - NODE_ENV=${NODE_ENV}
+      - MONGODB_URI=${MONGODB_URI}
+      - PORT=${PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALCHEMY_API_KEY=${ALCHEMY_API_KEY}
+      - ALCHEMY_API_URL=${ALCHEMY_API_URL}
+    # environment:
+    #   - NODE_ENV=development
+    #   - MONGODB_URI=mongodb+srv://admin:admin%40123456789@rccluster.z2zaprq.mongodb.net/realcheck
+    #   - PORT=5001
+    #   - JWT_SECRET=rounak-@-realcheck
+    #   - ALCHEMY_API_KEY=5K7HnIb6qo0mvi3cEh5N9r7IBdTgMCrT
+    #   - ALCHEMY_API_URL=https://eth-sepolia.g.alchemy.com/v2/5K7HnIb6qo0mvi3cEh5N9r7IBdTgMCrT

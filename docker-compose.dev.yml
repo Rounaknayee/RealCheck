@@ -16,8 +16,6 @@ services:
       - ./backend:/usr/src/app
     environment:
       - NODE_ENV=development
-    # depends_on:
-    #   - ganache
 
   frontend:
     container_name: frontend-realcheck

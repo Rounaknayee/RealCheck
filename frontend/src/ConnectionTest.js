@@ -6,7 +6,7 @@ import { faEarth } from '@fortawesome/free-solid-svg-icons';
 function ConnectionTest() {
   const [isConnected, setIsConnected] = useState(false);
 
-  const apiUrl = 'http://finals-loadb-rd3mnxcmy6rj-89363f3ec1c9bdec.elb.us-east-1.amazonaws.com:5001'; // URL of the backend API
+  const apiUrl = process.env.REACT_APP_BACKEND_URL; // URL of the backend API
 
   useEffect(() => {
     axios.get("/api/test")

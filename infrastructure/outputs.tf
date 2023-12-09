@@ -1,47 +1,32 @@
-# Output for EKS Cluster ID
-output "cluster_id" {
-  value       = aws_eks_cluster.realcheck_cluster.id
-  description = "EKS Cluster ID"
+output "load_balancer_dns_name" {
+  description = "The DNS name of the load balancer"
+  value       = aws_lb.realcheck_lb.dns_name
+
 }
 
-# Output for EKS Cluster Endpoint
-output "cluster_endpoint" {
-  value       = aws_eks_cluster.realcheck_cluster.endpoint
-  description = "EKS Cluster Endpoint"
+output "load_balancer_arn" {
+  description = "The ARN of the load balancer"
+  value       = aws_lb.realcheck_lb.arn
 }
 
-# Output for VPC ID
+
 output "vpc_id" {
-  value       = aws_vpc.realcheck_vpc.id
-  description = "VPC ID"
+  value = aws_vpc.realcheck_vpc.id
+  description = "The ID of the VPC"
 }
 
-# Output for Subnet1 ID
-output "subnet1_id" {
-  value       = aws_subnet.realcheck_subnet1.id
-  description = "Subnet1 ID"
+
+output "realcheck_public_subnet_1_id" {
+  value = aws_subnet.realcheck_public_subnet_1.id
+  description = "The ID of the first public subnet"
 }
 
-# Output for Subnet2 ID
-output "subnet2_id" {
-  value       = aws_subnet.realcheck_subnet2.id
-  description = "Subnet2 ID"
+output "realcheck_public_subnet_2_id" {
+  value = aws_subnet.realcheck_public_subnet_2.id
+  description = "The ID of the second public subnet"
 }
 
-# Output for EKS Node Group Name
-output "node_group_name" {
-  value       = aws_eks_node_group.realcheck_node_group.node_group_name
-  description = "EKS Node Group Name"
-}
-
-# Output for EKS Node Group ARN
-output "node_group_arn" {
-  value       = aws_eks_node_group.realcheck_node_group.arn
-  description = "EKS Node Group ARN"
-}
-
-# Output for EKS Node Group Status
-output "node_group_status" {
-  value       = aws_eks_node_group.realcheck_node_group.status
-  description = "EKS Node Group Status"
+output "ecs_service_security_group_id" {
+  value = aws_security_group.ecs_service_security_group.id
+  description = "The ID of the ECS service security group"
 }
