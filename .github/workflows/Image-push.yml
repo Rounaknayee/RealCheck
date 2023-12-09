@@ -38,62 +38,94 @@ jobs:
 
     - name: Docker Build Backend Image
       run: docker-compose -f docker-backend.yml build --no-cache
+      env:
+        NODE_ENV: development
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        PORT: 5001
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+        ALCHEMY_API_URL: ${{ secrets.ALCHEMY_API_URL }}
     
     - name: Docker Push Backend Image
       run: docker-compose -f docker-backend.yml push
 
-    - name: Create Docker ECS context
-      run: |
-            docker context create ecs realcheck-ecs-context --description "ECS Context" --docker "host=unix:///var/run/docker.sock" --default-stack-orchestrator ecs
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-
-    - name: Change the context
-      run: |
-        docker context use realcheck-ecs-context
-
-    - name: Deploy to ECS using Docker Compose
-      run: |
-        docker-compose -f docker-backend.yml up
-
-    # - name: Build Backend Docker Image
-    #   run: docker build -t rounaknayee/realcheck-backend:latest -f ./backend/prod-backend.Dockerfile ./backend
-
-    # - name: Push Backend Docker Image to Docker Hub
-    #   run: docker push rounaknayee/realcheck-backend:latest
-
-    # - name: Build Frontend Docker Image
-    #   run: docker build -t rounaknayee/realcheck-frontend:latest -f ./frontend/prod-frontend.Dockerfile ./frontend
-
-    # - name: Push Frontend Docker Image to Docker Hub
-    #   run: docker push rounaknayee/realcheck-frontend:latest
-
-
-    # -   name: Login to Amazon ECR Public
-    #     run: |
-    #       aws ecr-public get-login-password --region | docker login --username AWS --password-stdin public.ecr.aws/o4p6q9l0
-
-    # -   name: Tag Backend Image for Amazon ECR Public
-    #     run: docker tag rounaknayee/realcheck-backend:latest public.ecr.aws/o4p6q9l0/realcheck-backend:latest
-
-    # -   name: Push Backend Image to Amazon ECR Public
-    #     run: docker push public.ecr.aws/o4p6q9l0/realcheck-backend:latest
-
-    # -   name: Tag Frontend Image for Amazon ECR Public
-    #     run: docker tag rounaknayee/realcheck-frontend:latest public.ecr.aws/o4p6q9l0/realcheck-frontend:latest
-
-    # -   name: Push Frontend Image to Amazon ECR Public
-    #     run: docker push public.ecr.aws/o4p6q9l0/realcheck-frontend:latest
-
-  Frontend-Deploy-on-s3:
+  Backend-Terraform-Infra-Deployment:
     needs: build-and-push-backend-docker-images
+    outputs:
+      backend_url: ${{ steps.output_lb_url.outputs.LB_URL }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+    
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
-    # - name: Configure AWS Credentials
-      
+    - name: Terraform Init
+      uses: hashicorp/terraform-github-actions@v1.2.3
+      with:
+        terraform_version: "latest"
+        working_directory: "./backend/infrastructure"
+        subcommand: "init"
 
+    - name: Terraform Plan
+      uses: hashicorp/terraform-github-actions@v1.2.3
+      with:
+        terraform_version: "latest"
+        working_directory: "./backend/infrastructure"
+        subcommand: "plan"
+        plan_arguments: "-var-file=backend.tfvars -out=tfplan"
+
+    - name: Terraform Apply
+      uses: hashicorp/terraform-github-actions@v1.2.3
+      with:
+        terraform_version: "latest"
+        working_directory: "./backend/infrastructure"
+        subcommand: "apply"
+        auto_approve: true
+        plan_arguments: "-var-file=backend.tfvars -out=tfplan"
+        var_file_arguments: "-var-file=terraform.tfvars"
+
+    - name: Output Load Balancer URL
+      id: output_lb_url
+      run: |
+        echo "LB_URL=$(terraform output -raw load_balancer_dns_name):5001" >> $GITHUB_ENV
+    
+    - name: Validate Deployed Infrastructure
+      run: |
+        terraform validate -no-color ./backend/infrastructure
+        if [[ $? -ne 0 ]]; then
+          echo "Infrastructure validation failed!"
+          exit 1
+        else
+          echo "Infrastructure is valid!"
+          fi
+
+  Frontend-Deploy-on-s3:
+    needs: Backend-Terraform-Infra-Deployment
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Build Frontend React App
+      run: |
+        cd frontend
+        npm install
+        export REACT_APP_BACKEND_URL = ${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }} 
+        npm run build
+
+    - name: Deploy Frontend React App to S3
+      run: |
+        aws s3 sync ./build s3://realcheck --delete

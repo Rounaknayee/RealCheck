@@ -10,7 +10,7 @@ resource "aws_ecs_task_definition" "realcheck_task_definition" {
   container_definitions    = jsonencode([
     {
       name           = "realcheck_backend_container"
-      image          = "docker.io/rounaknayee/realcheck-backend:latest@sha256:df80fd982435aba184cf4126eeaa86e6143c40bc4e9c2a8e8fd093b6cdc1779d"
+      image          = "docker.io/rounaknayee/realcheck-backend:latest"
       portMappings = [
         {
           containerPort = 5001
