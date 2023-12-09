@@ -1,4 +1,4 @@
-name: Build and Push Docker Images to Docker Hub and Amazon ECR Public
+name: Build and Push Docker Images & Deploy Infrastructure
 
 on:
   workflow_dispatch:  # Manually trigger workflow
@@ -65,31 +65,20 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
+    - name: Terraform Setup
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: "latest" # or specify a specific version
+    
     - name: Terraform Init
-      uses: hashicorp/terraform-github-actions@v1.2.3
-      with:
-        terraform_version: "latest"
-        working_directory: "./backend/infrastructure"
-        subcommand: "init"
-
+      run: terraform init -backend-config="backend.tfvars" ./backend/infrastructure
+    
     - name: Terraform Plan
-      uses: hashicorp/terraform-github-actions@v1.2.3
-      with:
-        terraform_version: "latest"
-        working_directory: "./backend/infrastructure"
-        subcommand: "plan"
-        plan_arguments: "-var-file=backend.tfvars -out=tfplan"
-
+      run: terraform plan -var-file="backend.tfvars" -out=tfplan ./backend/infrastructure
+    
     - name: Terraform Apply
-      uses: hashicorp/terraform-github-actions@v1.2.3
-      with:
-        terraform_version: "latest"
-        working_directory: "./backend/infrastructure"
-        subcommand: "apply"
-        auto_approve: true
-        plan_arguments: "-var-file=backend.tfvars -out=tfplan"
-        var_file_arguments: "-var-file=terraform.tfvars"
-
+      run: terraform apply -auto-approve tfplan
+    
     - name: Output Load Balancer URL
       id: output_lb_url
       run: |
@@ -103,8 +92,8 @@ jobs:
           exit 1
         else
           echo "Infrastructure is valid!"
-          fi
-
+        fi
+      
   Frontend-Deploy-on-s3:
     needs: Backend-Terraform-Infra-Deployment
     runs-on: ubuntu-latest
