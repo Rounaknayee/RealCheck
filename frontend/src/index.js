@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import axios from 'axios';
 
 // axios.defaults.baseURL = process.env.BACKEND_URL;
-axios.defaults.baseURL = 'http://finals-loadb-rd3mnxcmy6rj-89363f3ec1c9bdec.elb.us-east-1.amazonaws.com:5001' // process.env._BACKEND_URL;
+axios.defaults.baseURL =  'http://localhost:5001';
 
 // axios.interceptors for adding the token to every request
 axios.interceptors.request.use(
