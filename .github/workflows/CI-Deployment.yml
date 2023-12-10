@@ -84,8 +84,7 @@ jobs:
       id: output_lb_url
       run: |
         LB_URL="$(terraform -chdir=./infrastructure output -raw load_balancer_dns_name):5001"
-        echo "LB_URL=$LB_URL" >> $GITHUB_ENV
-        echo "LB_URL=$LB_URL" >> $GITHUB_OUTPUT
+        echo "LB_URL=$LB_URL" >> "$GITHUB_OUTPUT"
 
     - name: Validate Deployed Infrastructure
       run: |
