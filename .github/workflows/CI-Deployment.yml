@@ -95,6 +95,7 @@ jobs:
           else
             echo "Infrastructure is valid!"
           fi
+    # store the output as a step output
     outputs:
       LB_URL: ${{ steps.output_lb_url.outputs.LB_URL }}
         
@@ -113,6 +114,7 @@ jobs:
     - name: Set REACT_APP_BACKEND_URL
       run: |
         export REACT_APP_BACKEND_URL=${{ needs.Backend-Terraform-Infra-Deployment.outputs.LB_URL }} >> $GITHUB_ENV
+        echo "REACT_APP_BACKEND_URL is set to: ${{ needs.Backend-Terraform-Infra-Deployment.outputs.LB_URL }}"
         echo "REACT_APP_BACKEND_URL is set to $REACT_APP_BACKEND_URL"
 
     - name: Build Frontend React App
