@@ -100,7 +100,9 @@ jobs:
       - name: Output Load Balancer URL
         id: lb_url_out
         run: |
-          LB_NAME_ENCODED=$(echo -n "$(terraform -chdir=./infrastructure output -raw load_balancer_dns_name | tr -d '\n'):5001" | base64)
+          LB_DNS_NAME=$(terraform -chdir=./infrastructure output -raw load_balancer_dns_name | tr -d '\n')
+          LB_NAME="${LB_DNS_NAME}:5001"
+          LB_NAME_ENCODED=$(echo -n "${LB_NAME}" | base64)
           echo "LB_URL=${LB_NAME_ENCODED}"
           echo "LB_URL=${LB_NAME_ENCODED}" >> $GITHUB_OUTPUT
 
@@ -132,15 +134,12 @@ jobs:
       env:
         CI: false
       run: |
-        LB_NAME_ENCODED="${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }}"
-        echo "Encoded LB_NAME: $LB_NAME_ENCODED"
-        LB_NAME_DECODED=$(echo -n "$LB_NAME_ENCODED" | base64 --decode)
-        echo "Decoded LB_NAME: $LB_NAME_DECODED"
+        LB_NAME_DECODED=$(echo -n "${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }}" | base64 --decode)
         echo "REACT_APP_BACKEND_URL=$LB_NAME_DECODED" >> $GITHUB_ENV
         echo "REACT_APP_BACKEND_URL is set to $REACT_APP_BACKEND_URL"
+        echo "REACT_APP_BACKEND_URL is again set to $REACT_APP_BACKEND_URL"
         cd frontend
-        npm run build      
-      shell: /usr/bin/bash -e {0} 
+        npm run build        
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
