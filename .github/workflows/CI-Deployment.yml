@@ -130,17 +130,13 @@ jobs:
         cd frontend
         npm install
 
-    - name: Set REACT_APP_BACKEND_URL
-      run: |
-        LB_NAME_DECODED=$(echo -n "${{ needs.Backend-Terraform-Infra-Deployment.outputs.LB_URL }}" | base64 --decode)
-        echo "LB_NAME_DECODED=$LB_NAME_DECODED" >> $GITHUB_ENV
-        echo "REACT_APP_BACKEND_URL is set to $LB_NAME_DECODED"
-
     - name: Build Frontend React App
       env:
-        REACT_APP_BACKEND_URL: ${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }}
         CI: false
       run: |
+        LB_NAME_DECODED=$(echo -n "${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }}" | base64 --decode)
+        echo "REACT_APP_BACKEND_URL=$LB_NAME_DECODED" >> $GITHUB_ENV
+        echo "REACT_APP_BACKEND_URL is set to $REACT_APP_BACKEND_URL"
         echo "REACT_APP_BACKEND_URL is again set to $REACT_APP_BACKEND_URL"
         cd frontend
         npm run build        
