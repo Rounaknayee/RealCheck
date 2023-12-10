@@ -1,9 +1,11 @@
+name: RealCheck CI/CD - AWS - ECS - Pipeline
 on:
   workflow_dispatch:  # Manually trigger workflow
   push:
     branches: [ main ]  # Trigger on push to main branch
     paths:
       - 'backend/**'
+      - 'frontend/**'
 
 jobs:
   build-and-push-backend-docker-images:
@@ -46,23 +48,25 @@ jobs:
     
     - name: Docker Push Backend Image
       run: docker-compose -f docker-backend.yml push
-
+  
   Backend-Terraform-Infra-Deployment:
     needs: build-and-push-backend-docker-images
     runs-on: ubuntu-latest
+    outputs:
+      backend_url: ${{ steps.lb_url_out.outputs.LB_URL }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
       
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform Setup
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
           terraform_version: "latest" # or specify a specific version
@@ -78,13 +82,13 @@ jobs:
       
       # Output Load Balancer URL
       - name: Output Load Balancer URL
-        id: output_lb_url
+        id: lb_url_out
         run: |
-          LB_DNS_NAME=$(terraform -chdir=./infrastructure output load_balancer_dns_name | tr -d '\n')
-          LB_URL="${LB_DNS_NAME}:5001"
-          echo "LB_URL=${LB_URL}"
-          echo "LB_URL=${LB_URL}" >> $GITHUB_ENV
-          echo "LB_URL=${LB_URL}" >> $GITHUB_OUTPUT
+          LB_DNS_NAME=$(terraform -chdir=./infrastructure output -raw load_balancer_dns_name | tr -d '\n')
+          LB_NAME="http://${LB_DNS_NAME}:5001"
+          LB_NAME_ENCODED=$(echo -n "${LB_NAME}" | base64 | tr -d '\n')
+          # echo "LB_URL=${LB_NAME_ENCODED}"
+          echo "LB_URL=${LB_NAME_ENCODED}" >> $GITHUB_OUTPUT
 
       - name: Validate Deployed Infrastructure
         run: |
@@ -96,8 +100,7 @@ jobs:
             echo "Infrastructure is valid!"
           fi
     # store the output as a step output
-    outputs:
-      lb_output: ${{ steps.output_lb_url.outputs.LB_URL }}
+    
         
   Frontend-Deploy-on-s3:
     needs: Backend-Terraform-Infra-Deployment
@@ -106,27 +109,29 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Build Frontend React App
+    - name: Install from Package.json
       run: |
         cd frontend
         npm install
 
-    - name: Set REACT_APP_BACKEND_URL
+    - name: set env variable
       run: |
-        export REACT_APP_BACKEND_URL=${{ needs.Backend-Terraform-Infra-Deployment.outputs.lb_output }} >> $GITHUB_ENV
-        echo "REACT_APP_BACKEND_URL is set needs to: ${{ needs.Backend-Terraform-Infra-Deployment.outputs.lb_output }}"
-        echo "REACT_APP_BACKEND_URL is set to $REACT_APP_BACKEND_URL"
+        LB_NAME_ENCODED=${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }}
+        echo "Encoded LB_NAME: $LB_NAME_ENCODED"
+        LB_NAME_DECODED=$(echo -n "$LB_NAME_ENCODED" | base64 --decode)
+        echo "Decoded LB_NAME: $LB_NAME_DECODED"
+        echo "REACT_APP_BACKEND_URL=$LB_NAME_DECODED" >> $GITHUB_ENV
 
     - name: Build Frontend React App
-      run: |
-        echo "REACT_APP_BACKEND_URL is again set to $REACT_APP_BACKEND_URL"
-        cd frontend
-        npm run build
       env:
         CI: false
+      run: |
+        echo "REACT_APP_BACKEND_URL is set to $REACT_APP_BACKEND_URL"
+        cd frontend
+        npm run build      
 
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
