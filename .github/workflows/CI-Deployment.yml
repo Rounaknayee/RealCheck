@@ -108,8 +108,14 @@ jobs:
       run: |
         cd frontend
         npm install
+
+    - name: Set REACT_APP_BACKEND_URL
+      run: |
         export REACT_APP_BACKEND_URL=${{ needs.Backend-Terraform-Infra-Deployment.outputs.LB_URL }} 
         echo "REACT_APP_BACKEND_URL is set to $REACT_APP_BACKEND_URL"
+
+    - name: Build Frontend React App
+      run: |
         npm run build
       env:
         CI: false
