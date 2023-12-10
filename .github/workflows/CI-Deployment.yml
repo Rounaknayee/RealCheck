@@ -139,7 +139,7 @@ jobs:
         echo "REACT_APP_BACKEND_URL is set to $REACT_APP_BACKEND_URL"
         echo "REACT_APP_BACKEND_URL is again set to $REACT_APP_BACKEND_URL"
         cd frontend
-        npm run build        
+        npm run build      
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
