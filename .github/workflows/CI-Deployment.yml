@@ -143,10 +143,7 @@ jobs:
       env:
         CI: false
       run: |
-        LB_NAME_DECODED=$(echo -n "${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }}" | base64 --decode)
-        echo "REACT_APP_BACKEND_URL=$LB_NAME_DECODED" >> $GITHUB_ENV
         echo "REACT_APP_BACKEND_URL is set to $REACT_APP_BACKEND_URL"
-        echo "REACT_APP_BACKEND_URL is again set to $REACT_APP_BACKEND_URL"
         cd frontend
         npm run build      
 
