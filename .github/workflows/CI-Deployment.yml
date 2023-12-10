@@ -119,6 +119,8 @@ jobs:
         npm install
         export REACT_APP_BACKEND_URL=${{ needs.Backend-Terraform-Infra-Deployment.outputs.LB_URL }} 
         npm run build
+      env:
+        CI: false
 
     - name: Deploy Frontend React App to S3
       run: |
