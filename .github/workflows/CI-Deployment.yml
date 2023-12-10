@@ -1,54 +1,56 @@
+name: RealCheck CI/CD - AWS - ECS - Pipeline
 on:
   workflow_dispatch:  # Manually trigger workflow
   push:
     branches: [ main ]  # Trigger on push to main branch
     paths:
       - 'backend/**'
+      - 'frontend/**'
 
 jobs:
-  # build-and-push-backend-docker-images:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Checkout Code
-  #     uses: actions/checkout@v4
+  build-and-push-backend-docker-images:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-  #   - name: Check current Docker version
-  #     run: docker --version
+    - name: Check current Docker version
+      run: docker --version
 
-  #   - name: Install latest Docker
-  #     run: |
-  #       sudo apt-get remove docker docker-engine docker.io containerd runc
-  #       sudo apt-get update
-  #       sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
-  #       curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-  #       echo \
-  #         "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-  #         $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  #       sudo apt-get update
-  #       sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+    - name: Install latest Docker
+      run: |
+        sudo apt-get remove docker docker-engine docker.io containerd runc
+        sudo apt-get update
+        sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+        echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+          $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
     
 
-  #   - name: Log in to Docker Hub
-  #     uses: docker/login-action@v2
-  #     with:
-  #       username: ${{ secrets.DOCKER_HUB_USERNAME }}
-  #       password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-  #   - name: Docker Build Backend Image
-  #     run: docker-compose -f docker-backend.yml build --no-cache
-  #     env:
-  #       NODE_ENV: development
-  #       MONGODB_URI: ${{ secrets.MONGODB_URI }}
-  #       PORT: 5001
-  #       JWT_SECRET: ${{ secrets.JWT_SECRET }}
-  #       ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
-  #       ALCHEMY_API_URL: ${{ secrets.ALCHEMY_API_URL }}
+    - name: Docker Build Backend Image
+      run: docker-compose -f docker-backend.yml build --no-cache
+      env:
+        NODE_ENV: development
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        PORT: 5001
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+        ALCHEMY_API_URL: ${{ secrets.ALCHEMY_API_URL }}
     
-  #   - name: Docker Push Backend Image
-  #     run: docker-compose -f docker-backend.yml push
+    - name: Docker Push Backend Image
+      run: docker-compose -f docker-backend.yml push
   
   Backend-Terraform-Infra-Deployment:
-    # needs: build-and-push-backend-docker-images
+    needs: build-and-push-backend-docker-images
     runs-on: ubuntu-latest
     outputs:
       backend_url: ${{ steps.lb_url_out.outputs.LB_URL }}
@@ -85,7 +87,7 @@ jobs:
           LB_DNS_NAME=$(terraform -chdir=./infrastructure output -raw load_balancer_dns_name | tr -d '\n')
           LB_NAME="http://${LB_DNS_NAME}:5001"
           LB_NAME_ENCODED=$(echo -n "${LB_NAME}" | base64 | tr -d '\n')
-          echo "LB_URL=${LB_NAME_ENCODED}"
+          # echo "LB_URL=${LB_NAME_ENCODED}"
           echo "LB_URL=${LB_NAME_ENCODED}" >> $GITHUB_OUTPUT
 
       - name: Validate Deployed Infrastructure
@@ -119,7 +121,6 @@ jobs:
         LB_NAME_DECODED=$(echo -n "$LB_NAME_ENCODED" | base64 --decode)
         echo "Decoded LB_NAME: $LB_NAME_DECODED"
         echo "REACT_APP_BACKEND_URL=$LB_NAME_DECODED" >> $GITHUB_ENV
-        echo "REACT_APP_BACKEND_URL is set to $REACT_APP_BACKEND_URL"
 
     - name: Build Frontend React App
       env:
