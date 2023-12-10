@@ -23,12 +23,12 @@ resource "aws_ecs_task_definition" "realcheck_task_definition" {
       cpu            = 256
       environment    = [
         { name = "NODE_ENV", value = "development" },
-        { name = "MONGODB_URI", value = env("MONGODB_URI") },
+        { name = "MONGODB_URI", value = var.mongodb_uri },
         { name = "PORT", value = "5001" },
-        { name = "JWT_SECRET", value = env("JWT_SECRET") },
-        { name = "ALCHEMY_API_KEY", value = env("ALCHEMY_API_KEY") },
-        { name = "ALCHEMY_API_URL", value = env("ALCHEMY_API_URL") },
-        { name = "CONTRACT_ADDRESS", value = env("CONTRACT_ADDRESS")}
+        { name = "JWT_SECRET", value = var.jwt_secret },
+        { name = "ALCHEMY_API_KEY", value = var.alchemy_api_key },
+        { name = "ALCHEMY_API_URL", value = var.alchemy_api_url },
+        { name = "CONTRACT_ADDRESS", value = var.contract_address}
       ]
       logConfiguration = {
         logDriver = "awslogs"
