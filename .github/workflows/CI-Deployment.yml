@@ -100,8 +100,11 @@ jobs:
       - name: Output Load Balancer URL
         id: lb_url_out
         run: |
-          echo "LB_URL=$(terraform -chdir=./infrastructure output -raw load_balancer_dns_name | tr -d '\n'):5001"
-          echo "LB_URL=$(terraform -chdir=./infrastructure output -raw load_balancer_dns_name | tr -d '\n'):5001" >> $GITHUB_OUTPUT
+          LB_DNS_NAME=$(terraform -chdir=./infrastructure output -raw load_balancer_dns_name | tr -d '\n')
+          LB_NAME="${LB_DNS_NAME}:5001"
+          LB_NAME_ENCODED=$(echo -n "${LB_NAME}" | base64)
+          echo "LB_URL=${LB_NAME_ENCODED}"
+          echo "LB_URL=${LB_NAME_ENCODED}" >> $GITHUB_OUTPUT
 
       - name: Validate Deployed Infrastructure
         run: |
@@ -122,16 +125,16 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Build Frontend React App
+    - name: Install from Package.json
       run: |
         cd frontend
         npm install
 
-    # - name: Set REACT_APP_BACKEND_URL
-    #   run: |
-    #     export REACT_APP_BACKEND_URL=${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }} >> $GITHUB_ENV
-    #     echo "REACT_APP_BACKEND_URL is backend set to: ${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }}"
-    #     echo "REACT_APP_BACKEND_URL is set to $REACT_APP_BACKEND_URL"
+    - name: Set REACT_APP_BACKEND_URL
+      run: |
+        LB_NAME_DECODED=$(echo -n "${{ needs.Backend-Terraform-Infra-Deployment.outputs.LB_URL }}" | base64 --decode)
+        echo "LB_NAME_DECODED=$LB_NAME_DECODED" >> $GITHUB_ENV
+        echo "REACT_APP_BACKEND_URL is set to $LB_NAME_DECODED"
 
     - name: Build Frontend React App
       env:
