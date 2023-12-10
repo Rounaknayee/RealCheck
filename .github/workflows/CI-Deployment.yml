@@ -50,6 +50,8 @@ jobs:
   Backend-Terraform-Infra-Deployment:
     # needs: build-and-push-backend-docker-images
     runs-on: ubuntu-latest
+    outputs:
+      backend_url: ${{ steps.output_lb_url.outputs.LB_URL }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -80,7 +82,7 @@ jobs:
       - name: Output Load Balancer URL
         id: output_lb_url
         run: |
-          LB_DNS_NAME=$(terraform -chdir=./infrastructure output load_balancer_dns_name | tr -d '\n')
+          LB_DNS_NAME=$(terraform -chdir=./infrastructure -raw output load_balancer_dns_name | tr -d '\n')
           LB_URL="${LB_DNS_NAME}:5001"
           echo "LB_URL=${LB_URL}"
           echo "LB_URL=${LB_URL}" >> $GITHUB_OUTPUT
@@ -96,8 +98,7 @@ jobs:
             echo "Infrastructure is valid!"
           fi
     # store the output as a step output
-    outputs:
-      backend_url: ${{ steps.output_lb_url.outputs.LB_URL }}
+    
         
   Frontend-Deploy-on-s3:
     needs: Backend-Terraform-Infra-Deployment
@@ -111,19 +112,20 @@ jobs:
         cd frontend
         npm install
 
-    - name: Set REACT_APP_BACKEND_URL
-      run: |
-        export REACT_APP_BACKEND_URL=${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }} >> $GITHUB_ENV
-        echo "REACT_APP_BACKEND_URL is backend set to: ${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }}"
-        echo "REACT_APP_BACKEND_URL is set to $REACT_APP_BACKEND_URL"
+    # - name: Set REACT_APP_BACKEND_URL
+    #   run: |
+    #     export REACT_APP_BACKEND_URL=${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }} >> $GITHUB_ENV
+    #     echo "REACT_APP_BACKEND_URL is backend set to: ${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }}"
+    #     echo "REACT_APP_BACKEND_URL is set to $REACT_APP_BACKEND_URL"
 
     - name: Build Frontend React App
+      env:
+        REACT_APP_BACKEND_URL: ${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }}
+        CI: false
       run: |
         echo "REACT_APP_BACKEND_URL is again set to $REACT_APP_BACKEND_URL"
         cd frontend
-        npm run build
-      env:
-        CI: false
+        npm run build        
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
