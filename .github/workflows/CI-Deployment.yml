@@ -69,7 +69,7 @@ jobs:
     # needs: build-and-push-backend-docker-images
     runs-on: ubuntu-latest
     outputs:
-      backend_url: ${{ steps.output_lb_url.outputs.LB_URL }}
+      backend_url: ${{ steps.lb_url_out.outputs.LB_URL }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -98,12 +98,12 @@ jobs:
       
       # Output Load Balancer URL
       - name: Output Load Balancer URL
-        id: output_lb_url
+        id: lb_url_out
         run: |
           LB_DNS_NAME=$(terraform -chdir=./infrastructure output -raw load_balancer_dns_name | tr -d '\n')
           LB_URL="${LB_DNS_NAME}:5001"
           echo "LB_URL=${LB_URL}"
-          echo "LB_URL=${LB_URL}" >> $GITHUB_OUTPUT
+          echo "LB_URL=tp_url" >> $GITHUB_OUTPUT
 
       - name: Validate Deployed Infrastructure
         run: |
