@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faQrcode } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 
 const Scan = () => {
@@ -10,32 +8,32 @@ const Scan = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [userDetails, setUserDetails] = useState([]);
 
-  const handleScan = (data) => {
-    if (data) {
-      setProductId(data);
-      setError('');
-      setUserDetails([]);
-      setIsScanning(false); 
-      return;
-    }
-  }
+  // const handleScan = (data) => {
+  //   if (data) {
+  //     setProductId(data);
+  //     setError('');
+  //     setUserDetails([]);
+  //     setIsScanning(false); 
+  //     return;
+  //   }
+  // }
 
-  const handleError = (err) => {
-    console.error(err);
-    setError('Scanning failed, please try again.');
-  }
+  // const handleError = (err) => {
+  //   console.error(err);
+  //   setError('Scanning failed, please try again.');
+  // }
 
   const validateProductId = (id) => {
     const regex = /^RC-\d{13}-\d{1,20}$/;
     return regex.test(id);
   };
 
-  const toggleScanner = () => {
-    setIsScanning(!isScanning);
-    if (isScanning) {
-      setProductId(''); 
-    }
-  };
+  // const toggleScanner = () => {
+  //   setIsScanning(!isScanning);
+  //   if (isScanning) {
+  //     setProductId(''); 
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();

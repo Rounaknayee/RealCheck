@@ -2,7 +2,7 @@ import React, { useReducer, useEffect} from 'react';
 import axios from 'axios';
 import QRCodeModal from '../QRCodeModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faQrcode, faCopy, faEdit, faMoneyBillTransfer } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faQrcode, faCopy, faEdit} from '@fortawesome/free-solid-svg-icons';
 import MEditTransferModal from './MEditTransferModal';
 
 
