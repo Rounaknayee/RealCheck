@@ -49,54 +49,55 @@ jobs:
 
   Backend-Terraform-Infra-Deployment:
     needs: build-and-push-backend-docker-images
-    outputs:
-      LB_URL : ${{ steps.output_lb_url.outputs.LB_URL }}
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
-
-    - name: Terraform Setup
-      uses: hashicorp/setup-terraform@v1
-      with:
-        terraform_wrapper: false
-        terraform_version: "latest" # or specify a specific version
-    
-    - name: Terraform Init
-      run: terraform -chdir=./infrastructure init
-    
-    - name: Terraform Plan
-      run: terraform -chdir=./infrastructure plan -out=tfplan
-    
-    - name: Terraform Apply
-      run: terraform -chdir=./infrastructure apply -auto-approve tfplan
-    
-    # Output Load Balancer URL
-    - name: Output Load Balancer URL
-      id: output_lb_url
-      run: |
-        LB_DNS_NAME=$(terraform -chdir=./infrastructure output load_balancer_dns_name | tr -d '\n')
-        LB_URL="${LB_DNS_NAME}:5001"
-        echo "LB_URL=$LB_URL"
-        echo "LB_URL=$LB_URL" >> "$GITHUB_OUTPUT"
-
-    - name: Validate Deployed Infrastructure
-      run: |
-        terraform -chdir=./infrastructure validate
-        if [[ $? -ne 0 ]]; then
-          echo "Infrastructure validation failed!"
-          exit 1
-        else
-          echo "Infrastructure is valid!"
-        fi
+      - name: Checkout Code
+        uses: actions/checkout@v4
       
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+          terraform_version: "latest" # or specify a specific version
+      
+      - name: Terraform Init
+        run: terraform -chdir=./infrastructure init
+      
+      - name: Terraform Plan
+        run: terraform -chdir=./infrastructure plan -out=tfplan
+      
+      - name: Terraform Apply
+        run: terraform -chdir=./infrastructure apply -auto-approve tfplan
+      
+      # Output Load Balancer URL
+      - name: Output Load Balancer URL
+        id: output_lb_url
+        run: |
+          LB_DNS_NAME=$(terraform -chdir=./infrastructure output load_balancer_dns_name | tr -d '\n')
+          LB_URL="${LB_DNS_NAME}:5001"
+          echo "LB_URL=${LB_URL}"
+          echo "LB_URL=${LB_URL}" >> $GITHUB_ENV
+          echo "LB_URL=${LB_URL}" >> $GITHUB_OUTPUT
+
+      - name: Validate Deployed Infrastructure
+        run: |
+          terraform -chdir=./infrastructure validate
+          if [[ $? -ne 0 ]]; then
+            echo "Infrastructure validation failed!"
+            exit 1
+          else
+            echo "Infrastructure is valid!"
+          fi
+    outputs:
+      LB_URL: ${{ steps.output_lb_url.outputs.LB_URL }}
+        
   Frontend-Deploy-on-s3:
     needs: Backend-Terraform-Infra-Deployment
     runs-on: ubuntu-latest
@@ -111,11 +112,13 @@ jobs:
 
     - name: Set REACT_APP_BACKEND_URL
       run: |
-        export REACT_APP_BACKEND_URL=${{ needs.Backend-Terraform-Infra-Deployment.outputs.LB_URL }} 
+        export REACT_APP_BACKEND_URL=${{ needs.Backend-Terraform-Infra-Deployment.outputs.LB_URL }} >> $GITHUB_ENV
         echo "REACT_APP_BACKEND_URL is set to $REACT_APP_BACKEND_URL"
 
     - name: Build Frontend React App
       run: |
+        echo "REACT_APP_BACKEND_URL is again set to $REACT_APP_BACKEND_URL"
+        cd frontend
         npm run build
       env:
         CI: false
