@@ -83,8 +83,8 @@ jobs:
     - name: Output Load Balancer URL
       id: output_lb_url
       run: |
-        LB_URL=$(terraform -chdir=./infrastructure output -raw load_balancer_dns_name)
-        LB_URL="${LB_URL}:5001"
+        LB_DNS_NAME=$(terraform -chdir=./infrastructure output load_balancer_dns_name | tr -d '\n')
+        LB_URL="${LB_DNS_NAME}:5001"
         echo "LB_URL=$LB_URL"
         echo "LB_URL=$LB_URL" >> "$GITHUB_OUTPUT"
 
