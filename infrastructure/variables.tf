@@ -11,3 +11,23 @@ variable "common_tags" {
   }
   description = "Common tags to be applied to all resources"
 }
+
+variable "mongodb_uri" {
+  type = string
+}
+
+variable "jwt_secret" {
+  type = string
+}
+
+variable "alchemy_api_key" {
+  type = string
+}
+
+variable "alchemy_api_url" {
+  type = string
+}
+
+variable "contract_address" {
+  type = string
+}

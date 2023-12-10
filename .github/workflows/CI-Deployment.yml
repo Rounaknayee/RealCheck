@@ -75,16 +75,12 @@ jobs:
         run: terraform -chdir=./infrastructure init
       
       - name: Terraform Plan
-        run: terraform -chdir=./infrastructure plan -out=tfplan
+        run: terraform -chdir=./infrastructure plan -out=tfplan -var="mongodb_uri=${{ secrets.MONGODB_URI }}" -var="jwt_secret=${{ secrets.JWT_SECRET }}" -var="alchemy_api_key=${{ secrets.ALCHEMY_API_KEY }}" -var="alchemy_api_url=${{ secrets.ALCHEMY_API_URL }}" -var="contract_address=${{ secrets.CONTRACT_ADDRESS }}"
+    
       
       - name: Terraform Apply
         run: terraform -chdir=./infrastructure apply -auto-approve tfplan
-        env:
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
-          ALCHEMY_API_URL: ${{ secrets.ALCHEMY_API_URL }}
-          CONTRACT_ADDRESS: ${{ secrets.CONTRACT_ADDRESS }}
+        
       
       # Output Load Balancer URL
       - name: Output Load Balancer URL
