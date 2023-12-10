@@ -97,7 +97,7 @@ jobs:
           fi
     # store the output as a step output
     outputs:
-      LB_URL: ${{ steps.output_lb_url.outputs.LB_URL }}
+      backend_url: ${{ steps.output_lb_url.outputs.LB_URL }}
         
   Frontend-Deploy-on-s3:
     needs: Backend-Terraform-Infra-Deployment
@@ -113,8 +113,8 @@ jobs:
 
     - name: Set REACT_APP_BACKEND_URL
       run: |
-        export REACT_APP_BACKEND_URL=${{ needs.Backend-Terraform-Infra-Deployment.outputs.LB_URL }} >> $GITHUB_ENV
-        echo "REACT_APP_BACKEND_URL is set to: ${{ needs.Backend-Terraform-Infra-Deployment.outputs.LB_URL }}"
+        export REACT_APP_BACKEND_URL=${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }} >> $GITHUB_ENV
+        echo "REACT_APP_BACKEND_URL is backend set to: ${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }}"
         echo "REACT_APP_BACKEND_URL is set to $REACT_APP_BACKEND_URL"
 
     - name: Build Frontend React App
