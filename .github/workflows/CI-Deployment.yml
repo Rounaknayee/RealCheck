@@ -68,6 +68,7 @@ jobs:
     - name: Terraform Setup
       uses: hashicorp/setup-terraform@v1
       with:
+        terraform_wrapper: false
         terraform_version: "latest" # or specify a specific version
     
     - name: Terraform Init
@@ -90,7 +91,7 @@ jobs:
 
     - name: Validate Deployed Infrastructure
       run: |
-        terraform validate ./infrastructure
+        terraform -chdir=./infrastructure validate
         if [[ $? -ne 0 ]]; then
           echo "Infrastructure validation failed!"
           exit 1
