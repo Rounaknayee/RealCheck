@@ -22,6 +22,12 @@ const startServer = async () => {
     app.listen(config.port, () => {
       console.log(`Server is running on http://localhost:${config.port} `);
     });
+    console.log('alchemyProvider', this.alchemyProvider);
+    console.log('alchemyurl', config.alchemyProviderURL);
+    console.log('contractAddress', config.contractAddress);
+    console.log('jwtSecret', config.jwtSecret);
+    console.log('mongoURI', config.mongoURI);
+    console.log('port', config.port);
   } catch (err) {
     console.error("Database connection failed", err);
     process.exit(1); // Exit with failure if the database connection fails
