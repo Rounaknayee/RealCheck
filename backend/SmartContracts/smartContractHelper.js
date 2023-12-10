@@ -17,7 +17,7 @@ class smartContractHelper {
         // console.log('signer', this.signer);
         // console.log('alchemyProvider', this.alchemyProvider);
         // console.log('alchemyurl', config.alchemyProviderURL);
-        // console.log('contractAddress', config.contractAddress);
+        console.log('contractAddress', config.contractAddress);
     }
 
     async addProduct(productId, name, manufacturer) {
