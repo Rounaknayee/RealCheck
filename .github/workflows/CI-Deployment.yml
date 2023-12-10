@@ -87,7 +87,7 @@ jobs:
 
       - name: Validate Deployed Infrastructure
         run: |
-          echo "LB_URL=${LB_URL}"
+          echo "LB_URL=${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }}"
           terraform -chdir=./infrastructure validate
           if [[ $? -ne 0 ]]; then
             echo "Infrastructure validation failed!"
