@@ -23,11 +23,12 @@ resource "aws_ecs_task_definition" "realcheck_task_definition" {
       cpu            = 256
       environment    = [
         { name = "NODE_ENV", value = "development" },
-        { name = "MONGODB_URI", value = "mongodb+srv://admin:admin%40123456789@rccluster.z2zaprq.mongodb.net/realcheck" },
+        { name = "MONGODB_URI", value = env("MONGODB_URI") },
         { name = "PORT", value = "5001" },
-        { name = "JWT_SECRET", value = "rounak-@-realcheck" },
-        { name = "ALCHEMY_API_KEY", value = "5K7HnIb6qo0mvi3cEh5N9r7IBdTgMCrT" },
-        { name = "ALCHEMY_API_URL", value = "https://eth-sepolia.g.alchemy.com/v2/5K7HnIb6qo0mvi3cEh5N9r7IBdTgMCrT" }
+        { name = "JWT_SECRET", value = env("JWT_SECRET") },
+        { name = "ALCHEMY_API_KEY", value = env("ALCHEMY_API_KEY") },
+        { name = "ALCHEMY_API_URL", value = env("ALCHEMY_API_URL") },
+        { name = "CONTRACT_ADDRESS", value = env("CONTRACT_ADDRESS")}
       ]
       logConfiguration = {
         logDriver = "awslogs"
