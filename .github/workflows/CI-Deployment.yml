@@ -101,13 +101,12 @@ jobs:
         id: lb_url_out
         run: |
           LB_DNS_NAME=$(terraform -chdir=./infrastructure output -raw load_balancer_dns_name | tr -d '\n')
-          LB_URL="${LB_DNS_NAME}:5001"
-          echo "LB_URL=${LB_URL}"
-          echo "LB_URL=tp_url" >> $GITHUB_OUTPUT
+          LB_NAME="${LB_DNS_NAME}:5001"
+          echo "LB_URL=${LB_NAME}"
+          echo "LB_URL=${LB_NAME}" >> $GITHUB_OUTPUT
 
       - name: Validate Deployed Infrastructure
         run: |
-          echo "LB_URL= ${{ needs.Backend-Terraform-Infra-Deployment.outputs.backend_url }}"
           terraform -chdir=./infrastructure validate
           if [[ $? -ne 0 ]]; then
             echo "Infrastructure validation failed!"
