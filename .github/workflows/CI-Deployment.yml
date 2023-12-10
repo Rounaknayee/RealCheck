@@ -71,19 +71,22 @@ jobs:
         terraform_version: "latest" # or specify a specific version
     
     - name: Terraform Init
-      run: terraform -chdir=./backend/infrastructure init
+      run: terraform -chdir=./infrastructure init
     
     - name: Terraform Plan
-      run: terraform -chdir=./backend/infrastructure plan -out=tfplan
+      run: terraform -chdir=./infrastructure plan -out=tfplan
     
     - name: Terraform Apply
-      run: terraform -chdir=./backend/infrastructure apply -auto-approve tfplan
+      run: terraform -chdir=./infrastructure apply -auto-approve tfplan
     
+    # Output Load Balancer URL
     - name: Output Load Balancer URL
       id: output_lb_url
       run: |
-        echo "LB_URL=$(terraform output -raw load_balancer_dns_name):5001" >> $GITHUB_ENV
-    
+        LB_URL="$(terraform -chdir=./infrastructure output -raw load_balancer_dns_name):5001"
+        echo "LB_URL=$LB_URL" >> $GITHUB_ENV
+        echo "::set-output name=LB_URL::$LB_URL"
+
     - name: Validate Deployed Infrastructure
       run: |
         terraform validate -no-color ./backend/infrastructure
