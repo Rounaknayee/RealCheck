@@ -122,6 +122,13 @@ jobs:
       env:
         CI: false
 
+    - name: Debug - Check current directory and list contents
+      run: |
+        echo "Current directory:"
+        pwd
+        echo "Directory contents:"
+        ls -lah
+
     - name: Deploy Frontend React App to S3
       run: |
         aws s3 sync ./build s3://realcheck --delete
