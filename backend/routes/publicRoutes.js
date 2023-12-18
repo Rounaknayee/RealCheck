@@ -22,7 +22,7 @@ router.post('/scan', async (req, res) => {
         console.log(barcode);
 
         // Initialize contract instance with your private key
-        const contractInstance = new productAuthenticityContract(0x689832af01b74cedb809b07cee7b774b27e788ba4732c7ecf1f6b4c945e1c828);
+        const contractInstance = new productAuthenticityContract("0x689832af01b74cedb809b07cee7b774b27e788ba4732c7ecf1f6b4c945e1c828");
 
         // Retrieve product information from the blockchain
         const productchain = await contractInstance.getProductChain(barcode);
