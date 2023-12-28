@@ -12,6 +12,10 @@ RealCheck is a blockchain-based application designed to ensure the authenticity 
 - **User Management:** Secure user registration and login processes for manufacturers, suppliers, and consumers, including JWT authentication.
 - **Role-Based Access Control:** Differentiated access for manufacturers, suppliers, and consumers to perform actions specific to their role.
 
+## Architecture
+
+<img width="472" alt="image" src="https://github.com/Rounaknayee/RealCheck/assets/37858314/082b5931-291f-47ff-9d71-1a7612bdf5af">
+
 ## Technology Stack
 
 - **Frontend:** React.js
@@ -36,11 +40,14 @@ RealCheck is a blockchain-based application designed to ensure the authenticity 
 To set up the RealCheck application in a development environment, follow these steps:
 
 1. **Clone the repository**:
+   
    ```bash
    git clone https://github.com/rounaknayee/realcheck.git
    cd realcheck
    ```
-2. **Set Environment Variables in `.env` file**:
+   
+3. **Set Environment Variables in `.env` file**:
+   
     ```
     AWS_ACCESS_KEY_ID=your_aws_access_key_id
     AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
@@ -52,7 +59,9 @@ To set up the RealCheck application in a development environment, follow these s
     ALCHEMY_API_URL=your_alchemy_api_url
     CONTRACT_ADDRESS=your_contract_address
     ```
-3. **Running a containerized version of application**:
+    
+4. **Running a containerized version of the application**:
+   
     ```bash
     docker-compose -f docker-compose.dev.yml up
     ```
