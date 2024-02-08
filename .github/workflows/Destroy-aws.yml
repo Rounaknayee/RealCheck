@@ -1,0 +1,28 @@
+name: RealCheck - AWS - Terraform - Destroy
+on:
+  workflow_dispatch:  # Manually trigger workflow
+  
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+          terraform_version: "latest" # or specify a specific version
+      
+      - name: Terraform Refresh
+        run: terraform -chdir=./infrastructure refresh -var="mongodb_uri=${{ secrets.MONGODB_URI }}" -var="jwt_secret=${{ secrets.JWT_SECRET }}" -var="alchemy_api_key=${{ secrets.ALCHEMY_API_KEY }}" -var="alchemy_api_url=${{ secrets.ALCHEMY_API_URL }}" -var="contract_address=${{ secrets.CONTRACT_ADDRESS }}" 
+      
+      - name: Terraform Destroy
+        run: terraform -chdir=./infrastructure destroy -auto-approve -var="mongodb_uri=${{ secrets.MONGODB_URI }}" -var="jwt_secret=${{ secrets.JWT_SECRET }}" -var="alchemy_api_key=${{ secrets.ALCHEMY_API_KEY }}" -var="alchemy_api_url=${{ secrets.ALCHEMY_API_URL }}" -var="contract_address=${{ secrets.CONTRACT_ADDRESS }}"
+
+      
