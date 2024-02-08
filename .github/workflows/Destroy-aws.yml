@@ -22,6 +22,9 @@ jobs:
           terraform_wrapper: false
           terraform_version: "latest" # or specify a specific version
       
+      - name: Terraform Init
+        run: terraform -chdir=./infrastructure init
+      
       - name: Terraform Refresh
         run: terraform -chdir=./infrastructure refresh -var="mongodb_uri=${{ secrets.MONGODB_URI }}" -var="jwt_secret=${{ secrets.JWT_SECRET }}" -var="alchemy_api_key=${{ secrets.ALCHEMY_API_KEY }}" -var="alchemy_api_url=${{ secrets.ALCHEMY_API_URL }}" -var="contract_address=${{ secrets.CONTRACT_ADDRESS }}" 
       
